@@ -793,6 +793,7 @@ class FirebaseBackend {
     if (/network-request-failed/.test(code)) return 'Sin conexión. Comprueba tu red.';
     if (/user-disabled/.test(code)) return 'Esta cuenta está desactivada.';
     if (/operation-not-allowed/.test(code)) return 'El acceso con correo y contraseña no está activado en el proyecto.';
+    if (/api-key-not-valid|invalid-api-key|project-not-found/.test(code)) return 'La configuración de Firebase (firebase-config.js) no es válida.';
     return e && e.message ? e.message : 'Ha ocurrido un error.';
   }
   dbError(e, fallback) {
