@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuidapp</title>
+<meta name="description" content="Cuidapp: cuidado de personas mayores a domicilio. Versión web.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0&display=block">
+<style>
+/* ------------------------------------------------------------------ page */
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:radial-gradient(1200px 800px at 25% 15%,#1d2d26 0%,#0c110f 65%);
+  color:#e3e9e5;min-height:100vh;
+}
+.stage{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:40px;padding:28px 20px;flex-wrap:wrap}
+
+/* ------------------------------------------------------------------ phone */
+.phone{
+  position:relative;width:390px;height:812px;flex:none;
+  border-radius:48px;background:#0b0d0c;padding:11px;
+  box-shadow:0 40px 90px rgba(0,0,0,.65),0 0 0 1px #2b3230,inset 0 0 0 2px #1b1f1d;
+}
+.phone::after{
+  content:"";position:absolute;top:22px;left:50%;transform:translateX(-50%);
+  width:110px;height:26px;border-radius:14px;background:#0b0d0c;z-index:5;
+}
+.phone-inner{
+  position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;
+  background:var(--surface);color:var(--on-surface);display:flex;flex-direction:column;
+}
+.statusbar{
+  height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 26px 0;font-size:14px;font-weight:600;letter-spacing:.2px;
+}
+.statusbar .ms{font-size:17px}
+.statusbar .right{display:flex;gap:4px;align-items:center}
+.screen{flex:1;min-height:0;position:relative;overflow:hidden}
+
+/* ------------------------------------------------------- Material 3 tokens */
+.phone-inner{
+  --primary:#1F6F55;--on-primary:#FFFFFF;--primary-container:#A8F2D2;--on-primary-container:#00201A;
+  --secondary:#4C6358;--on-secondary:#FFFFFF;--secondary-container:#CEE9DA;--on-secondary-container:#092017;
+  --tertiary:#3E6374;--on-tertiary:#FFFFFF;--tertiary-container:#C1E8FB;--on-tertiary-container:#001F2A;
+  --error:#BA1A1A;--on-error:#FFFFFF;--error-container:#FFDAD6;--on-error-container:#410002;
+  --surface:#F5FBF5;--on-surface:#171D1A;--on-surface-variant:#3F4943;
+  --surface-container-lowest:#FFFFFF;--surface-container-low:#EFF5F0;--surface-container:#E9EFEA;
+  --surface-container-high:#E4EAE4;--surface-container-highest:#DEE4DE;
+  --outline:#6F7972;--outline-variant:#BEC9C1;
+  --inverse-surface:#2C322E;--inverse-on-surface:#ECF2EC;
+  --scrim:rgba(0,0,0,.32);
+}
+.phone-inner[data-theme="dark"]{
+  --primary:#8CD5B7;--on-primary:#003828;--primary-container:#00513B;--on-primary-container:#A8F2D2;
+  --secondary:#B2CCBE;--on-secondary:#1E352B;--secondary-container:#354B41;--on-secondary-container:#CEE9DA;
+  --tertiary:#A6CCDE;--on-tertiary:#093544;--tertiary-container:#254B5C;--on-tertiary-container:#C1E8FB;
+  --error:#FFB4AB;--on-error:#690005;--error-container:#93000A;--on-error-container:#FFDAD6;
+  --surface:#0F1512;--on-surface:#DEE4DF;--on-surface-variant:#BEC9C1;
+  --surface-container-lowest:#0A0F0D;--surface-container-low:#171D1A;--surface-container:#1B211E;
+  --surface-container-high:#252B28;--surface-container-highest:#303633;
+  --outline:#89938C;--outline-variant:#3F4943;
+  --inverse-surface:#DEE4DF;--inverse-on-surface:#2C322E;
+  --scrim:rgba(0,0,0,.5);
+}
+
+/* ------------------------------------------------------------------ icons */
+.ms{
+  font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;font-size:24px;
+  line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;
+  direction:ltr;-webkit-font-smoothing:antialiased;font-feature-settings:'liga';
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;flex:none;
+}
+.ms.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+
+/* ------------------------------------------------------------- typography */
+.headline-m{font-size:28px;line-height:36px;font-weight:400;margin:0}
+.headline-s{font-size:24px;line-height:32px;font-weight:400;margin:0}
+.title-l{font-size:22px;line-height:28px;font-weight:400}
+.title-m{font-size:16px;line-height:24px;font-weight:500;letter-spacing:.15px}
+.body-l{font-size:16px;line-height:24px;letter-spacing:.5px}
+.body-m{font-size:14px;line-height:20px;letter-spacing:.25px;margin:0}
+.body-s{font-size:12px;line-height:16px;letter-spacing:.4px;margin:0}
+.label-m{font-size:12px;line-height:16px;font-weight:500;letter-spacing:.5px}
+.label-s{font-size:11px;line-height:16px;font-weight:500;letter-spacing:.5px}
+.bold{font-weight:700}
+.muted{color:var(--on-surface-variant)}
+.center{text-align:center}
+.primary{color:var(--primary)}
+
+/* ------------------------------------------------------------------ layout */
+.route{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--surface)}
+.route.anim{animation:route-in .2s ease-out}
+@keyframes route-in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.route.black{background:#000;color:#fff}
+.body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.body.center{display:flex;align-items:center;justify-content:center}
+.col{display:flex;flex-direction:column}
+.row{display:flex;align-items:center}
+.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}
+.spacer{flex:1}
+.right{display:flex;justify-content:flex-end}
+
+/* ------------------------------------------------------------------ appbar */
+.appbar{height:64px;flex:none;display:flex;align-items:center;padding:0 4px;background:var(--surface);transition:background .2s}
+.appbar.scrolled{background:var(--surface-container)}
+.appbar.black,.appbar.black.scrolled{background:#000;color:#fff}
+.appbar .title{flex:1;font-size:22px;line-height:28px;padding-left:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .title.noleading{padding-left:16px}
+.appbar .actions{display:flex;align-items:center}
+.iconbtn{
+  width:48px;height:48px;border-radius:50%;border:0;background:transparent;color:var(--on-surface-variant);
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;position:relative;padding:0;flex:none;
+}
+.iconbtn:hover{background:color-mix(in srgb,var(--on-surface) 8%,transparent)}
+.iconbtn:active{background:color-mix(in srgb,var(--on-surface) 12%,transparent)}
+.iconbtn:disabled{color:color-mix(in srgb,var(--on-surface) 38%,transparent);cursor:default;background:transparent}
+.appbar.black .iconbtn{color:#fff}
+.badge{
+  position:absolute;top:6px;left:26px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;
+  background:var(--error);color:var(--on-error);font-size:11px;line-height:16px;font-weight:500;
+}
+
+/* ------------------------------------------------------------------- cards */
+.card{background:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:16px;margin:4px;overflow:hidden}
+.tile{display:flex;align-items:center;gap:16px;padding:12px 16px;min-height:56px;cursor:pointer;user-select:none}
+.tile:hover{background:color-mix(in srgb,var(--on-surface) 6%,transparent)}
+.tile.static{cursor:default}
+.tile.static:hover{background:transparent}
+.tile .lead{width:40px;display:flex;justify-content:center;align-items:center;color:var(--on-surface-variant);flex:none}
+.tile .text{flex:1;min-width:0}
+.tile .t{font-size:16px;line-height:24px;letter-spacing:.5px}
+.tile .s{font-size:14px;line-height:20px;letter-spacing:.25px;color:var(--on-surface-variant)}
+.tile .trail{display:flex;align-items:center;color:var(--on-surface-variant);flex:none}
+.pill{
+  margin-right:8px;padding:3px 8px;border-radius:12px;background:var(--error);color:var(--on-error);
+  font-size:11px;line-height:16px;font-weight:700;letter-spacing:.5px;
+}
+.avatar{
+  width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none;
+  background:var(--primary-container);color:var(--on-primary-container);
+}
+.avatar.off{background:var(--surface-container-highest);color:var(--outline)}
+
+/* ----------------------------------------------------------------- buttons */
+.btn{
+  font:500 14px/20px Roboto,system-ui,sans-serif;letter-spacing:.1px;border-radius:100px;height:40px;padding:0 24px;
+  border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;
+  transition:background .15s,box-shadow .15s;
+}
+.btn .ms{font-size:18px}
+.btn.filled{background:var(--primary);color:var(--on-primary)}
+.btn.filled:hover{box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.btn.filled:disabled{background:color-mix(in srgb,var(--on-surface) 12%,transparent);color:color-mix(in srgb,var(--on-surface) 38%,transparent);cursor:default;box-shadow:none}
+.btn.outlined{background:transparent;color:var(--primary);border:1px solid var(--outline)}
+.btn.outlined:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.btn.outlined:disabled{color:color-mix(in srgb,var(--on-surface) 38%,transparent);border-color:color-mix(in srgb,var(--on-surface) 12%,transparent);cursor:default}
+.btn.text{background:transparent;color:var(--primary);padding:0 12px}
+.btn.text:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.btn.text:disabled{color:color-mix(in srgb,var(--on-surface) 38%,transparent);cursor:default;background:transparent}
+.btn.block{width:100%}
+.btn.tall{height:52px}
+.btn.h48{height:48px}
+.btn.icon-filled{width:50px;height:50px;padding:0;border-radius:50%;background:var(--primary);color:var(--on-primary);flex:none}
+.btn.icon-filled .ms{font-size:22px}
+
+/* ------------------------------------------------------------- text fields */
+.field{position:relative;margin-bottom:16px}
+.field .box{
+  display:flex;align-items:center;height:56px;border:1px solid var(--outline);border-radius:4px;
+  background:var(--surface-container-highest);padding:0 12px;gap:12px;transition:border-color .12s;
+}
+.field.focus .box{border:2px solid var(--primary);padding:0 11px}
+.field.error .box{border-color:var(--error)}
+.field .prefix{color:var(--on-surface-variant);font-size:24px}
+.field.focus .prefix{color:var(--primary)}
+.field.error .prefix{color:var(--error)}
+.field input{flex:1;border:0;background:transparent;outline:0;font:400 16px/24px Roboto,system-ui,sans-serif;color:var(--on-surface);min-width:0;padding:0}
+.field input:disabled{color:color-mix(in srgb,var(--on-surface) 38%,transparent)}
+.field label{
+  position:absolute;left:48px;top:16px;font-size:16px;line-height:24px;color:var(--on-surface-variant);
+  pointer-events:none;transition:all .14s ease-out;padding:0 4px;margin-left:-4px;
+}
+.field.focus label,.field.float label{
+  top:-8px;left:12px;font-size:12px;line-height:16px;
+  background:linear-gradient(to bottom,var(--field-above,var(--surface)) 50%,var(--surface-container-highest) 50%);
+}
+.field.focus label{color:var(--primary)}
+.field.error label{color:var(--error)}
+.field .suffix{margin-right:-8px;width:40px;height:40px}
+.field .helper{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--error);padding:4px 16px 0}
+.field .hint{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--on-surface-variant);padding:4px 16px 0}
+
+/* --------------------------------------------------------------- checkbox */
+.cbwrap{width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;border-radius:50%}
+.cbwrap:hover{background:color-mix(in srgb,var(--on-surface) 8%,transparent)}
+.cbwrap.off{cursor:default}
+.cbwrap.off:hover{background:transparent}
+.cb{width:18px;height:18px;border:2px solid var(--on-surface-variant);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;transition:background .12s}
+.cb.on{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.cb .ms{font-size:16px;font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 20}
+
+/* --------------------------------------------------------------- progress */
+.progress{height:10px;border-radius:8px;background:var(--surface-container-highest);overflow:hidden;flex:1}
+.progress.thin{height:8px}
+.progress>i{display:block;height:100%;background:var(--primary);border-radius:8px;transition:width .35s ease}
+.spinner{
+  width:36px;height:36px;border-radius:50%;border:4px solid color-mix(in srgb,var(--primary) 20%,transparent);
+  border-top-color:var(--primary);animation:spin .9s linear infinite;flex:none;
+}
+.spinner.small{width:22px;height:22px;border-width:2px;border-color:color-mix(in srgb,var(--on-surface) 12%,transparent);border-top-color:var(--primary)}
+.spinner.white{border-color:rgba(255,255,255,.25);border-top-color:#fff}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* --------------------------------------------------------------- segmented */
+.seg{display:flex;border:1px solid var(--outline);border-radius:100px;overflow:hidden;height:40px;margin:12px 12px 0}
+.seg button{
+  flex:1;border:0;background:transparent;color:var(--on-surface);font:500 14px/20px Roboto,system-ui,sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:0 12px;
+}
+.seg button+button{border-left:1px solid var(--outline)}
+.seg button.on{background:var(--secondary-container);color:var(--on-secondary-container)}
+.seg button .ms{font-size:16px}
+
+/* ------------------------------------------------------------------- tasks */
+.cat-header{padding:20px 20px 4px;display:flex;align-items:center;gap:8px;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.cat-header .ms{font-size:18px}
+.cat-header .count{margin-left:auto;font-weight:500;letter-spacing:.5px;color:var(--outline);text-transform:none}
+.task{display:flex;align-items:center;padding:4px 8px}
+.task.disabled{opacity:.5}
+.task .content{flex:1;min-width:0;padding:8px 0}
+.task .title{font-size:16px;line-height:24px;letter-spacing:.5px}
+.task .title.resolved{text-decoration:line-through;color:var(--outline)}
+.task .title.critical{font-weight:600}
+.task .chips{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px;font-size:12px;line-height:16px;letter-spacing:.4px}
+.task .chip{display:inline-flex;align-items:center;gap:4px}
+.task .chip .ms{font-size:14px}
+.task .note{margin-top:4px;font-style:italic;font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--on-surface-variant);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.task .secondary{display:flex;align-items:center;flex:none}
+.task .secondary .cat{font-size:22px}
+.empty{padding:32px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty .ms{font-size:56px;color:var(--outline);margin-bottom:8px}
+.empty .ms.err{color:var(--error)}
+
+/* -------------------------------------------------------------------- chat */
+.chat-list{min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:12px 0}
+.day-sep{display:flex;justify-content:center;padding:12px 0}
+.day-sep span{padding:4px 12px;border-radius:12px;background:var(--surface-container-highest);font-size:11px;line-height:16px;font-weight:500;letter-spacing:.5px}
+.sys-msg{padding:8px 24px;text-align:center;font-size:12px;line-height:16px;font-style:italic;color:var(--on-surface-variant)}
+.bubble-row{display:flex;padding:2px 12px}
+.bubble-row.mine{justify-content:flex-end}
+.bubble{
+  max-width:78%;padding:10px 14px;border-radius:16px 16px 16px 4px;background:var(--surface-container-highest);
+  color:var(--on-surface);font-size:14px;line-height:20px;letter-spacing:.25px;word-wrap:break-word;white-space:pre-wrap;
+}
+.mine .bubble{background:var(--primary-container);color:var(--on-primary-container);border-radius:16px 16px 4px 16px}
+.bubble .sender{font-size:11px;line-height:16px;font-weight:700;letter-spacing:.5px;color:var(--primary);margin-bottom:2px}
+.bubble .meta{display:flex;justify-content:flex-end;align-items:center;gap:4px;margin-top:2px;font-size:11px;line-height:16px;font-weight:500;letter-spacing:.5px}
+.bubble .meta .time{opacity:.6}
+.bubble .meta .ms{font-size:14px;opacity:.6}
+.bubble .meta .ms.read{color:var(--primary);opacity:1}
+.composer{
+  flex:none;display:flex;align-items:flex-end;gap:8px;padding:8px 8px 8px 12px;background:var(--surface);
+  box-shadow:0 -3px 10px rgba(0,0,0,.14);position:relative;z-index:2;
+}
+.composer .tbox{flex:1;border:1px solid var(--outline);border-radius:4px;background:var(--surface-container-highest);display:flex}
+.composer .tbox.focus{border:2px solid var(--primary)}
+.composer textarea{
+  flex:1;border:0;background:transparent;outline:0;resize:none;font:400 16px/24px Roboto,system-ui,sans-serif;
+  color:var(--on-surface);padding:12px 16px;min-height:48px;max-height:144px;
+}
+.composer textarea::placeholder{color:var(--on-surface-variant)}
+
+/* -------------------------------------------------------------- camera live */
+.video-wrap{width:100%;aspect-ratio:16/9;position:relative;background:#000;overflow:hidden}
+.video-wrap canvas{width:100%;height:100%;display:block}
+.video-wrap .scan{position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.035) 0 1px,transparent 1px 3px);pointer-events:none}
+.video-wrap .hud{position:absolute;left:10px;top:8px;display:flex;align-items:center;gap:6px;font:600 11px/14px Roboto,monospace;color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.6px}
+.video-wrap .hud i{width:8px;height:8px;border-radius:50%;background:#ff3b30;animation:blink 1.2s steps(2) infinite}
+.video-wrap .ts{position:absolute;right:10px;top:8px;font:500 11px/14px "Roboto Mono",Consolas,monospace;color:#fff;text-shadow:0 1px 2px #000}
+.video-wrap .foot{position:absolute;left:10px;bottom:8px;font:400 10px/12px Roboto,sans-serif;color:rgba(255,255,255,.55)}
+@keyframes blink{50%{opacity:0}}
+
+/* -------------------------------------------------------- snackbar + sheet */
+.snackbar{
+  position:absolute;left:16px;right:16px;bottom:16px;background:var(--inverse-surface);color:var(--inverse-on-surface);
+  padding:14px 16px;border-radius:4px;font-size:14px;line-height:20px;letter-spacing:.25px;
+  transform:translateY(24px);opacity:0;transition:.2s;pointer-events:none;box-shadow:0 3px 8px rgba(0,0,0,.35);z-index:40;
+}
+.snackbar.show{transform:none;opacity:1}
+.scrim{position:absolute;inset:0;background:var(--scrim);z-index:30;display:none;align-items:flex-end}
+.scrim.show{display:flex}
+.sheet{
+  width:100%;background:var(--surface-container-low);border-radius:28px 28px 0 0;padding:20px;
+  animation:sheet-up .22s ease-out;--field-above:var(--surface-container-low);
+}
+@keyframes sheet-up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.sheet textarea{
+  width:100%;border:1px solid var(--outline);border-radius:4px;background:var(--surface-container-highest);
+  font:400 16px/24px Roboto,system-ui,sans-serif;color:var(--on-surface);padding:12px 16px;resize:none;outline:0;height:120px;
+}
+.sheet textarea:focus{border:2px solid var(--primary);padding:11px 15px}
+.sheet textarea::placeholder{color:var(--on-surface-variant)}
+.sheet .counter{text-align:right;font-size:12px;line-height:16px;color:var(--on-surface-variant);padding:4px 16px 0}
+
+/* ------------------------------------------------------------- demo panel */
+.demo-panel{width:360px;max-width:100%;color:#dfe6e1}
+.demo-panel h1{font-size:26px;margin:0 0 4px;font-weight:700;color:#fff;display:flex;align-items:baseline;gap:10px}
+.demo-panel h1 small{font-size:13px;font-weight:500;color:#8cd5b7;letter-spacing:.6px;text-transform:uppercase}
+.demo-panel h2{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8cd5b7;margin:22px 0 8px;font-weight:600}
+.demo-panel p{font-size:14px;line-height:21px;margin:0 0 8px;color:#b9c4bd}
+.demo-panel table{border-collapse:collapse;width:100%;font-size:14px}
+.demo-panel td{padding:6px 8px 6px 0;border-bottom:1px solid #26302b;color:#dfe6e1;vertical-align:top}
+.demo-panel td:first-child{color:#8fa39a;width:92px}
+.demo-panel code{font-family:Consolas,"Roboto Mono",monospace;font-size:13px;color:#fff;background:#1f2925;padding:1px 6px;border-radius:4px}
+.demo-panel .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.demo-panel button{
+  font:500 13px/18px Roboto,system-ui,sans-serif;padding:8px 14px;border-radius:100px;border:1px solid #37453e;
+  background:#16201b;color:#e6ece8;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+}
+.demo-panel button:hover{background:#1f2c25;border-color:#4d5e55}
+.demo-panel button.accent{background:#1F6F55;border-color:#1F6F55;color:#fff}
+.demo-panel button.accent:hover{background:#268a69}
+.demo-panel .ms{font-size:18px}
+.demo-panel .status{font-size:13px;color:#8fa39a;margin-top:14px}
+.demo-panel .status b{color:#fff;font-weight:600}
+.demo-panel .warn{background:#2a2114;border:1px solid #5a4620;border-radius:12px;padding:12px 14px;margin-top:12px}
+.demo-panel .warn p{color:#f0d9a6;margin:0 0 8px}
+.mode{display:inline-flex;align-items:center;gap:6px;font:600 12px/16px Roboto,sans-serif;letter-spacing:.4px;padding:4px 10px;border-radius:100px;margin-top:6px}
+.mode.local{background:#2b2418;color:#f0d9a6;border:1px solid #5a4620}
+.mode.firebase{background:#13291f;color:#8cd5b7;border:1px solid #1F6F55}
+.mode .ms{font-size:16px}
+
+@media (max-width:560px){
+  .stage{padding:0;gap:0;display:block}
+  .phone{width:100%;height:100vh;height:100dvh;border-radius:0;padding:0;box-shadow:none}
+  .phone::after{display:none}
+  .phone-inner{border-radius:0}
+  .statusbar{padding-top:6px;height:32px}
+  .demo-panel{padding:20px 18px 32px}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone">
+    <div class="phone-inner" id="phoneInner">
+      <div class="statusbar"><span id="clock">09:41</span><span class="right"><span class="ms fill">signal_cellular_4_bar</span><span class="ms">wifi</span><span class="ms fill">battery_full</span></span></div>
+      <div class="screen" id="app"></div>
+      <div class="scrim" id="scrim"></div>
+      <div class="snackbar" id="snackbar"></div>
+    </div>
+  </div>
+
+  <aside class="demo-panel">
+    <h1>Cuidapp <small>versión web</small></h1>
+    <p>Plataforma de cuidado de personas mayores a domicilio: acceso, panel del familiar, jornada del cuidador, chat y cámaras.</p>
+    <span class="mode" id="modeChip"></span>
+    <p id="modeText" style="margin-top:8px"></p>
+
+    <h2>Cuentas de prueba</h2>
+    <table id="accountsTable"></table>
+    <div class="actions" id="loginButtons"></div>
+
+    <h2>Opciones</h2>
+    <div class="actions">
+      <button data-demo="dark"><span class="ms" id="darkIcon">dark_mode</span><span id="darkLabel">Modo oscuro</span></button>
+      <button data-demo="reset" id="resetBtn"><span class="ms">restart_alt</span>Reiniciar datos</button>
+    </div>
+    <div class="warn" id="pendingTools" hidden>
+      <p id="pendingText"></p>
+      <div class="actions" id="pendingActions">
+        <button data-demo="approve-family">Aprobar como familiar</button>
+        <button data-demo="approve-caregiver">Aprobar como cuidadora</button>
+      </div>
+    </div>
+    <p class="status" id="demoStatus"></p>
+    <p style="margin-top:14px" id="hintText"></p>
+  </aside>
+</div>
+
+<!-- Configuración de Firebase. Si `window.CUIDAPP_FIREBASE` es null, la app funciona en modo demo local. -->
+<script src="firebase-config.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ================================================================== utils */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const fmtHm = ms => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const todayStr = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const atTime = (hhmm, base = new Date(), dayOffset = 0) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  const d = new Date(base); d.setDate(d.getDate() + dayOffset); d.setHours(h, m, 0, 0); return d.getTime();
+};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const icon = (name, o = {}) =>
+  `<span class="ms${o.fill ? ' fill' : ''}${o.cls ? ' ' + o.cls : ''}" style="${o.size ? `font-size:${o.size}px;` : ''}${o.color ? `color:${o.color};` : ''}">${name}</span>`;
+
+/* ============================================================ constantes */
+const FIREBASE_CDN = 'https://www.gstatic.com/firebasejs/12.17.1/';
+const FIREBASE_CONFIG = (window.CUIDAPP_FIREBASE && window.CUIDAPP_FIREBASE.apiKey) ? window.CUIDAPP_FIREBASE : null;
+/** Un usuario sin "@" se convierte en `usuario@<dominio>`: Firebase Auth exige un correo. */
+const USERNAME_DOMAIN = String(window.CUIDAPP_USERNAME_DOMAIN || 'cuidapp.ggabor.online').toLowerCase();
+const ELDER_ID = 'elder_carmen';
+const ELDER_NAME = 'Carmen Ferrer';
+
+const CATEGORY = {
+  medication:    { label: 'Medicación', icon: 'medication',        color: '#D64545' },
+  meal:          { label: 'Comidas',    icon: 'restaurant',        color: '#E08A00' },
+  hygiene:       { label: 'Aseo',       icon: 'shower',            color: '#2A9D8F' },
+  cleaning:      { label: 'Limpieza',   icon: 'cleaning_services', color: '#5B8DEF' },
+  mobility:      { label: 'Movilidad',  icon: 'directions_walk',   color: '#7B5EA7' },
+  companionship: { label: 'Compañía',   icon: 'chat_bubble',       color: '#CC6699' },
+  other:         { label: 'Otros',      icon: 'checklist',         color: 'var(--outline)' },
+};
+
+function toEmail(login) {
+  const v = String(login || '').trim().toLowerCase();
+  if (!v) return '';
+  return v.includes('@') ? v : `${v}@${USERNAME_DOMAIN}`;
+}
+function loginError(login) {
+  const v = String(login || '').trim().toLowerCase();
+  if (!v) return 'Introduce tu usuario o correo';
+  if (v.includes('@')) return v.includes('.') ? null : 'Correo no válido';
+  return /^[a-z0-9._-]{2,}$/.test(v) ? null : 'Usuario no válido';
+}
+const isProvisioned = u => !!u && u.role !== 'unknown' && u.elderIds.length > 0;
+
+/** Copia de pickActiveShift() de shift.dart */
+function pickActiveShift(shifts, now) {
+  if (!shifts.length) return null;
+  for (const s of shifts) if (s.status === 'in_progress') return s;
+  for (const s of shifts) {
+    if (s.status === 'completed') continue;
+    if (s.scheduledEnd == null || now < s.scheduledEnd) return s;
+  }
+  return shifts[shifts.length - 1];
+}
+const isOverdue = (t, now) => t.status === 'pending' && t.scheduledAt != null && now > t.scheduledAt;
+
+/* ====================================================== backend: local */
+// Mismo cuadrante y plan de cuidados que functions/scripts/seed.mjs
+const ASSIGNMENTS = [
+  { id: 'turno_manana', start: '09:00', end: '14:00' },
+  { id: 'turno_tarde',  start: '16:30', end: '19:00' },
+];
+const CARE_PLAN = [
+  { id: 'med_manana', title: 'Medicación de la mañana',   category: 'medication',    order: 1, timeOfDay: '09:30', isCritical: true, requiresPhoto: true },
+  { id: 'desayuno',   title: 'Preparar el desayuno',      category: 'meal',          order: 2, timeOfDay: '09:45' },
+  { id: 'aseo',       title: 'Aseo personal y vestido',   category: 'hygiene',       order: 3, timeOfDay: '10:15' },
+  { id: 'paseo',      title: 'Paseo de 20 minutos',       category: 'mobility',      order: 4, timeOfDay: '11:00' },
+  { id: 'limpieza',   title: 'Limpieza de cocina y baño', category: 'cleaning',      order: 5 },
+  { id: 'comida',     title: 'Preparar la comida',        category: 'meal',          order: 6, timeOfDay: '13:30' },
+  { id: 'med_tarde',  title: 'Medicación de la tarde',    category: 'medication',    order: 7, timeOfDay: '17:00', isCritical: true, requiresPhoto: true },
+  { id: 'compania',   title: 'Conversación y compañía',   category: 'companionship', order: 8, timeOfDay: '17:30' },
+];
+const LOCAL_USERS = [
+  { uid: 'family_test',   email: `test@${USERNAME_DOMAIN}`, password: 'cuidapp123', displayName: 'Usuario de prueba', role: 'family',    elderIds: [ELDER_ID] },
+  { uid: 'family_lucia',  email: 'lucia@example.com',        password: 'test1234',   displayName: 'Lucía Ferrer',      role: 'family',    elderIds: [ELDER_ID] },
+  { uid: 'caregiver_ana', email: 'ana@example.com',          password: 'test1234',   displayName: 'Ana Ruiz',          role: 'caregiver', elderIds: [ELDER_ID] },
+];
+
+/** Reparto de plantillas entre turnos: copia de templatesForAssignment() de generate-shifts.ts */
+function templatesFor(assignment) {
+  const isFirst = ASSIGNMENTS[0].id === assignment.id;
+  const isLast = ASSIGNMENTS[ASSIGNMENTS.length - 1].id === assignment.id;
+  return CARE_PLAN.filter(t => {
+    if (!t.timeOfDay) return isFirst;
+    const fits = t.timeOfDay >= assignment.start && t.timeOfDay <= assignment.end;
+    if (fits) return true;
+    const anywhere = ASSIGNMENTS.some(a => t.timeOfDay >= a.start && t.timeOfDay <= a.end);
+    return !anywhere && isLast;
+  });
+}
+
+/** Genera el estado del día. Es "consciente de la hora" para que la demo sea coherente a cualquier hora. */
+function seedLocal() {
+  const now = new Date();
+  const h = now.getHours() + now.getMinutes() / 60;
+  const T = hhmm => atTime(hhmm, now);
+  const hOf = hhmm => { const [a, b] = hhmm.split(':').map(Number); return a + b / 60; };
+  const users = {};
+  for (const u of LOCAL_USERS) users[u.email] = { ...u };
+
+  const shifts = ASSIGNMENTS.map((a, i) => {
+    const isMorning = i === 0;
+    let status = 'scheduled', checkInAt = null, checkOutAt = null;
+    if (isMorning) {
+      if (h >= 9.04) { status = 'in_progress'; checkInAt = T('09:02'); }
+      if (h >= 14)   { status = 'completed';   checkOutAt = T('13:58'); }
+    } else if (h >= 16.56) { status = 'in_progress'; checkInAt = T('16:33'); }
+
+    const tasks = templatesFor(a).map(t => {
+      let done = false;
+      if (status === 'completed') done = true;
+      else if (status === 'in_progress') done = t.timeOfDay ? h >= hOf(t.timeOfDay) + 0.12 : h >= 12.2;
+      if (!isMorning && t.id === 'compania') done = false; // siempre queda algo por hacer en la demo
+      const completedAt = done ? (t.timeOfDay ? T(t.timeOfDay) + 6 * 60000 : T('12:10')) : null;
+      let note = null;
+      if (done && t.id === 'aseo')   note = 'Hoy ha querido ducharse ella sola; solo he ayudado con el pelo.';
+      if (done && t.id === 'comida') note = 'Ha comido bastante bien. Ha dejado un poco de verdura.';
+      return {
+        id: t.id, title: t.title, category: t.category, order: t.order,
+        status: done ? 'done' : 'pending',
+        scheduledAt: t.timeOfDay ? T(t.timeOfDay) : null,
+        completedAt, completedBy: done ? 'caregiver_ana' : null,
+        note, photoUrl: (done && t.requiresPhoto) ? 'demo' : null,
+        requiresPhoto: !!t.requiresPhoto, isCritical: !!t.isCritical,
+      };
+    });
+    return {
+      id: `${ELDER_ID}_${todayStr(now)}_${a.id}`, elderId: ELDER_ID, elderName: ELDER_NAME,
+      caregiverUid: 'caregiver_ana', assignmentId: a.id, date: todayStr(now), status,
+      total: tasks.length, done: tasks.filter(t => t.status === 'done').length,
+      scheduledStart: T(a.start), scheduledEnd: T(a.end), checkInAt, checkOutAt, tasks,
+    };
+  });
+
+  const L = users['lucia@example.com'], A = users['ana@example.com'];
+  const raw = [
+    { day: -1, t: '18:40', from: L, text: 'Hola Ana, el jueves viene el fisio a las 12. ¿Puedes tenerla lista y desayunada para entonces?' },
+    { day: -1, t: '18:52', from: A, text: 'Claro, la tendré vestida y desayunada antes. ¿Le doy la medicación antes o después?' },
+    { day: -1, t: '18:55', from: L, text: 'Antes, como siempre. ¡Gracias!' },
+    { day: 0, t: '09:02', system: 'Ana Ruiz ha fichado la entrada a las 09:02', when: h >= 9.04 },
+    { day: 0, t: '09:58', from: A, text: 'Buenos días. Carmen ha desayunado bien y ya tiene la medicación tomada 👍', when: h >= 10, unread: true },
+    { day: 0, t: '10:41', from: A, text: 'Se ha quejado un poco de la rodilla al levantarse. Le he puesto la crema y hemos hecho el paseo corto.', when: h >= 10.75, unread: true },
+    { day: 0, t: '13:58', system: 'Ana Ruiz ha fichado la salida a las 13:58', when: h >= 14 },
+    { day: 0, t: '16:33', system: 'Ana Ruiz ha fichado la entrada a las 16:33', when: h >= 16.56 },
+  ];
+  const messages = []; let n = 0;
+  for (const m of raw) {
+    if (m.when === false) continue;
+    const sentAt = atTime(m.t, now, m.day);
+    if (m.system) {
+      messages.push({ id: 'm' + (++n), senderUid: 'system', senderName: 'Sistema', type: 'system', text: m.system, readBy: [], sentAt });
+    } else {
+      // Los familiares (Lucía y la cuenta de prueba) tienen sin leer los mensajes de hoy de Ana.
+      const readBy = m.unread ? [m.from.uid] : [L.uid, A.uid, 'family_test'];
+      messages.push({ id: 'm' + (++n), senderUid: m.from.uid, senderName: m.from.displayName, type: 'text', text: m.text, readBy, sentAt });
+    }
+  }
+  return {
+    date: todayStr(now), users, shifts,
+    cameras: [
+      { id: 'cam_salon',   label: 'Salón',   status: 'online', hasAudio: true, supportsTwoWayAudio: true },
+      { id: 'cam_pasillo', label: 'Pasillo', status: 'online', hasAudio: true, supportsTwoWayAudio: false },
+    ],
+    conversation: { id: 'conv_' + ELDER_ID, messages },
+  };
+}
+
+class LocalBackend {
+  constructor(onChange) {
+    this.mode = 'local';
+    this.onChange = onChange;
+    this.loading = true;
+    this.errors = {};
+    this.STORAGE_KEY = 'cuidapp_demo_v2';
+    this.SESSION_KEY = 'cuidapp_demo_session_v2';
+    this.db = null; this.session = {};
+  }
+  async init() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || 'null');
+      this.db = (stored && stored.date === todayStr()) ? stored : seedLocal();
+    } catch { this.db = seedLocal(); }
+    try { this.session = JSON.parse(localStorage.getItem(this.SESSION_KEY) || 'null') || {}; } catch { this.session = {}; }
+    this.session.userEmail ??= null;
+    this.save();
+    await sleep(900); // splash, como la resolución de sesión de Firebase
+    this.loading = false;
+    this.onChange();
+  }
+  save() {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.db));
+      localStorage.setItem(this.SESSION_KEY, JSON.stringify(this.session));
+    } catch {}
+  }
+  reset() { this.db = seedLocal(); this.save(); this.onChange(); }
+  currentUser() { return this.session.userEmail ? (this.db.users[this.session.userEmail] || null) : null; }
+  findUser(login) {
+    const email = toEmail(login);
+    if (this.db.users[email]) return this.db.users[email];
+    const name = String(login).trim().toLowerCase();
+    if (!name.includes('@')) return Object.values(this.db.users).find(u => u.email.split('@')[0] === name) || null;
+    return null;
+  }
+  async signIn(login, password) {
+    await sleep(650);
+    const u = this.findUser(login);
+    if (!u || u.password !== password) throw new Error('Usuario o contraseña incorrectos.');
+    this.session.userEmail = u.email; this.save(); this.onChange();
+  }
+  async register(name, login, password) {
+    await sleep(650);
+    const email = toEmail(login);
+    if (this.db.users[email]) throw new Error('Ya existe una cuenta con ese correo.');
+    this.db.users[email] = { uid: 'u_' + Date.now().toString(36), email, password, displayName: name.trim(), role: 'unknown', elderIds: [] };
+    this.session.userEmail = email; this.save(); this.onChange();
+  }
+  async signOut() { this.session.userEmail = null; this.save(); this.onChange(); }
+  async resetPassword() { /* sin correo real en modo local */ }
+  approve(role) {
+    const u = this.currentUser(); if (!u) return;
+    u.role = role; u.elderIds = [ELDER_ID]; this.save(); this.onChange();
+  }
+  shifts() {
+    const u = this.currentUser(); if (!u) return [];
+    return u.role === 'caregiver' ? this.db.shifts.filter(s => s.caregiverUid === u.uid) : this.db.shifts;
+  }
+  cameras() { return this.db.cameras; }
+  messages() { return this.db.conversation.messages; }
+  unreadCount(uid) { return this.db.conversation.messages.filter(m => m.type !== 'system' && m.senderUid !== uid && !m.readBy.includes(uid)).length; }
+  find(shiftId, taskId) {
+    const shift = this.db.shifts.find(s => s.id === shiftId);
+    return { shift, task: shift?.tasks.find(t => t.id === taskId) };
+  }
+  async toggleTask(shiftId, taskId) {
+    const { shift, task } = this.find(shiftId, taskId);
+    if (!task) throw new Error('La tarea ya no existe.');
+    const next = task.status === 'done' ? 'pending' : 'done';
+    if (next === 'done' && task.requiresPhoto && !task.photoUrl) throw new Error('Esta tarea requiere una foto como evidencia.');
+    const delta = (next === 'done' ? 1 : 0) - (task.status === 'done' ? 1 : 0);
+    task.status = next;
+    task.completedAt = next === 'done' ? Date.now() : null;
+    task.completedBy = next === 'done' ? this.currentUser().uid : null;
+    shift.done = clamp(shift.done + delta, 0, shift.total);
+    this.save(); this.onChange();
+  }
+  async saveNote(shiftId, taskId, note) { const { task } = this.find(shiftId, taskId); if (task) { task.note = note || null; this.save(); this.onChange(); } }
+  async attachPhoto(shiftId, taskId) { const { task } = this.find(shiftId, taskId); if (task) { task.photoUrl = 'demo'; this.save(); this.onChange(); } }
+  system(text) { this.db.conversation.messages.push({ id: 'm' + Date.now(), senderUid: 'system', senderName: 'Sistema', type: 'system', text, readBy: [], sentAt: Date.now() }); }
+  async checkIn(shiftId) {
+    const shift = this.db.shifts.find(s => s.id === shiftId); if (!shift) return;
+    shift.status = 'in_progress'; shift.checkInAt = Date.now();
+    this.system(`${this.currentUser().displayName} ha fichado la entrada a las ${fmtHm(shift.checkInAt)}`);
+    this.save(); this.onChange();
+  }
+  async checkOut(shiftId) {
+    const shift = this.db.shifts.find(s => s.id === shiftId); if (!shift) return;
+    shift.status = 'completed'; shift.checkOutAt = Date.now();
+    this.system(`${this.currentUser().displayName} ha fichado la salida a las ${fmtHm(shift.checkOutAt)}`);
+    const pendingCritical = shift.tasks.filter(t => t.status === 'pending' && t.isCritical).map(t => t.title);
+    if (pendingCritical.length) this.system(`Tareas importantes sin completar: ${pendingCritical.slice(0, 3).join(', ')}.`);
+    else this.system(`Visita finalizada. Todas las tareas de hoy se han completado (${shift.done}/${shift.total}).`);
+    this.save(); this.onChange();
+  }
+  async sendMessage(text) {
+    const me = this.currentUser();
+    this.db.conversation.messages.push({ id: 'm' + Date.now(), senderUid: me.uid, senderName: me.displayName, type: 'text', text, readBy: [me.uid], sentAt: Date.now() });
+    this.save(); this.onChange();
+  }
+  async markAsRead() {
+    const me = this.currentUser(); let changed = false;
+    for (const m of this.db.conversation.messages) if (m.type !== 'system' && !m.readBy.includes(me.uid)) { m.readBy.push(me.uid); changed = true; }
+    if (changed) { this.save(); this.onChange(); }
+  }
+}
+
+/* =================================================== backend: Firebase */
+class FirebaseBackend {
+  constructor(config, onChange) {
+    this.mode = 'firebase';
+    this.config = config;
+    this.onChange = onChange;
+    this.loading = true;
+    this.errors = {};
+    this.authUser = null; this.profile = null;
+    this.shiftsRaw = []; this.tasksByShift = {}; this.camerasRaw = []; this.messagesRaw = []; this.conversationDoc = null;
+    this.profileSub = null; this.dataSubs = []; this.taskSubs = {}; this.dataKey = null;
+  }
+  async init() {
+    const [app, auth, fs] = await Promise.all([
+      import(FIREBASE_CDN + 'firebase-app.js'),
+      import(FIREBASE_CDN + 'firebase-auth.js'),
+      import(FIREBASE_CDN + 'firebase-firestore.js'),
+    ]);
+    this.A = auth; this.F = fs;
+    this.app = app.initializeApp(this.config);
+    this.auth = auth.getAuth(this.app);
+    try {
+      // Persistencia offline, como en la app Flutter.
+      this.db = fs.initializeFirestore(this.app, { localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) });
+    } catch { this.db = fs.getFirestore(this.app); }
+    auth.onAuthStateChanged(this.auth, user => this.onAuthUser(user));
+  }
+  onAuthUser(user) {
+    if (this.profileSub) { this.profileSub(); this.profileSub = null; }
+    this.clearData();
+    this.authUser = user; this.profile = null; this.errors = {};
+    if (!user) { this.loading = false; this.onChange(); return; }
+    this.loading = true;
+    const { doc, onSnapshot } = this.F;
+    this.profileSub = onSnapshot(doc(this.db, 'users', user.uid), snap => {
+      this.profile = snap.exists() ? snap.data() : null;
+      this.loading = false;
+      this.subscribeData();
+      this.onChange();
+    }, err => { this.errors.profile = err; this.profile = null; this.loading = false; this.onChange(); });
+  }
+  currentUser() {
+    const u = this.authUser; if (!u) return null;
+    const p = this.profile || {};
+    return { uid: u.uid, email: u.email || '', displayName: p.displayName || u.displayName || (u.email || '').split('@')[0], role: p.role || 'unknown', elderIds: Array.isArray(p.elderIds) ? p.elderIds : [] };
+  }
+  clearData() {
+    for (const off of this.dataSubs) off();
+    for (const id of Object.keys(this.taskSubs)) this.taskSubs[id]();
+    this.dataSubs = []; this.taskSubs = {}; this.dataKey = null;
+    this.shiftsRaw = []; this.tasksByShift = {}; this.camerasRaw = []; this.messagesRaw = []; this.conversationDoc = null;
+  }
+  subscribeData() {
+    const u = this.currentUser();
+    if (!isProvisioned(u)) { this.clearData(); return; }
+    const elderId = u.elderIds[0];
+    const key = `${u.uid}|${u.role}|${elderId}|${todayStr()}`;
+    if (this.dataKey === key) return;
+    this.clearData(); this.dataKey = key;
+    const { collection, doc, query, where, orderBy, limit, onSnapshot } = this.F;
+    const fail = k => err => { console.warn('[cuidapp]', k, err); this.errors[k] = err; this.onChange(); };
+
+    // Las reglas exigen `uid in memberUids`: la consulta debe llevarlo para que Firestore pueda autorizarla.
+    const shiftsQ = u.role === 'caregiver'
+      ? query(collection(this.db, 'shifts'), where('caregiverUid', '==', u.uid), where('date', '==', todayStr()), where('memberUids', 'array-contains', u.uid))
+      : query(collection(this.db, 'shifts'), where('elderId', '==', elderId), where('date', '==', todayStr()), where('memberUids', 'array-contains', u.uid));
+    this.dataSubs.push(onSnapshot(shiftsQ, snap => {
+      delete this.errors.shifts;
+      this.shiftsRaw = snap.docs.map(d => this.mapShift(d)).sort((a, b) => (a.scheduledStart ?? 0) - (b.scheduledStart ?? 0) || a.id.localeCompare(b.id));
+      this.syncTaskSubs(); this.onChange();
+    }, fail('shifts')));
+
+    if (u.role !== 'caregiver') {
+      this.dataSubs.push(onSnapshot(collection(this.db, 'elders', elderId, 'cameras'), snap => {
+        delete this.errors.cameras;
+        this.camerasRaw = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.label).localeCompare(String(b.label)));
+        this.onChange();
+      }, fail('cameras')));
+    }
+
+    const convRef = doc(this.db, 'conversations', 'conv_' + elderId);
+    this.dataSubs.push(onSnapshot(convRef, snap => { this.conversationDoc = snap.exists() ? snap.data() : null; this.onChange(); }, fail('conversation')));
+    this.dataSubs.push(onSnapshot(query(collection(convRef, 'messages'), orderBy('sentAt', 'desc'), limit(100)), snap => {
+      delete this.errors.messages;
+      this.messagesRaw = snap.docs.map(d => this.mapMessage(d)).sort((a, b) => a.sentAt - b.sentAt);
+      this.onChange();
+    }, fail('messages')));
+  }
+  syncTaskSubs() {
+    const { collection, query, orderBy, onSnapshot } = this.F;
+    const ids = new Set(this.shiftsRaw.map(s => s.id));
+    for (const id of Object.keys(this.taskSubs)) if (!ids.has(id)) { this.taskSubs[id](); delete this.taskSubs[id]; delete this.tasksByShift[id]; }
+    for (const id of ids) if (!this.taskSubs[id]) {
+      this.taskSubs[id] = onSnapshot(query(collection(this.db, 'shifts', id, 'tasks'), orderBy('order')), snap => {
+        this.tasksByShift[id] = snap.docs.map(d => this.mapTask(d)); this.onChange();
+      }, err => { console.warn('[cuidapp] tasks', err); this.errors.tasks = err; this.onChange(); });
+    }
+  }
+  ms(t) { return t == null ? null : (typeof t.toMillis === 'function' ? t.toMillis() : Number(t)); }
+  mapShift(d) {
+    const x = d.data({ serverTimestamps: 'estimate' });
+    return { id: d.id, elderId: x.elderId, elderName: x.elderName || '', caregiverUid: x.caregiverUid, assignmentId: x.assignmentId || null, date: x.date,
+      status: x.status || 'scheduled', total: x.taskSummary?.total ?? 0, done: x.taskSummary?.done ?? 0,
+      scheduledStart: this.ms(x.scheduledStart), scheduledEnd: this.ms(x.scheduledEnd), checkInAt: this.ms(x.checkInAt), checkOutAt: this.ms(x.checkOutAt) };
+  }
+  mapTask(d) {
+    const x = d.data({ serverTimestamps: 'estimate' });
+    return { id: d.id, title: x.title || '', category: x.category || 'other', order: x.order ?? 0, status: x.status || 'pending',
+      scheduledAt: this.ms(x.scheduledAt), completedAt: this.ms(x.completedAt), completedBy: x.completedBy || null,
+      note: x.note || null, photoUrl: x.photoUrl || null, requiresPhoto: !!x.requiresPhoto, isCritical: !!x.isCritical };
+  }
+  mapMessage(d) {
+    const x = d.data({ serverTimestamps: 'estimate' });
+    return { id: d.id, senderUid: x.senderUid || '', senderName: x.senderName || '', type: x.type || 'text', text: x.text || '',
+      readBy: Array.isArray(x.readBy) ? x.readBy : [], sentAt: this.ms(x.sentAt) ?? Date.now(), pending: d.metadata.hasPendingWrites };
+  }
+  authError(e) {
+    const code = e && e.code || '';
+    if (/invalid-credential|user-not-found|wrong-password|invalid-login-credentials|invalid-email/.test(code)) return 'Usuario o contraseña incorrectos.';
+    if (/email-already-in-use/.test(code)) return 'Ya existe una cuenta con ese correo.';
+    if (/weak-password/.test(code)) return 'La contraseña es demasiado débil.';
+    if (/too-many-requests/.test(code)) return 'Demasiados intentos. Espera unos minutos.';
+    if (/network-request-failed/.test(code)) return 'Sin conexión. Comprueba tu red.';
+    if (/user-disabled/.test(code)) return 'Esta cuenta está desactivada.';
+    if (/operation-not-allowed/.test(code)) return 'El acceso con correo y contraseña no está activado en el proyecto.';
+    return e && e.message ? e.message : 'Ha ocurrido un error.';
+  }
+  dbError(e, fallback) {
+    const code = e && e.code || '';
+    if (code === 'permission-denied') return 'No tienes permiso para hacer este cambio.';
+    if (code === 'unavailable') return 'Sin conexión. Se guardará al recuperar la red.';
+    if (code === 'aborted') return 'Conflicto al guardar. Inténtalo de nuevo.';
+    return e && e.message && !code ? e.message : fallback;
+  }
+  async signIn(login, password) {
+    try { await this.A.signInWithEmailAndPassword(this.auth, toEmail(login), password); }
+    catch (e) { throw new Error(this.authError(e)); }
+  }
+  async register(name, login, password) {
+    const { doc, setDoc, serverTimestamp } = this.F;
+    let cred;
+    try { cred = await this.A.createUserWithEmailAndPassword(this.auth, toEmail(login), password); }
+    catch (e) { throw new Error(this.authError(e)); }
+    try { await this.A.updateProfile(cred.user, { displayName: name.trim() }); } catch {}
+    try {
+      // El cliente nunca fija su rol: queda pendiente hasta que el backend lo aprueba.
+      await setDoc(doc(this.db, 'users', cred.user.uid), {
+        email: cred.user.email, displayName: name.trim(), elderIds: [], fcmTokens: [], locale: 'es',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Madrid', createdAt: serverTimestamp(),
+      });
+    } catch (e) { console.warn('[cuidapp] perfil', e); }
+  }
+  async signOut() { await this.A.signOut(this.auth); }
+  async resetPassword(login) { try { await this.A.sendPasswordResetEmail(this.auth, toEmail(login)); } catch (e) { throw new Error(this.authError(e)); } }
+  shifts() { return this.shiftsRaw.map(s => ({ ...s, tasks: this.tasksByShift[s.id] || [] })); }
+  cameras() { return this.camerasRaw; }
+  messages() { return this.messagesRaw; }
+  unreadCount(uid) { return this.messagesRaw.filter(m => m.type !== 'system' && m.senderUid !== uid && !m.readBy.includes(uid)).length; }
+  async toggleTask(shiftId, taskId) {
+    const { doc, runTransaction, serverTimestamp } = this.F;
+    const uid = this.currentUser().uid;
+    try {
+      await runTransaction(this.db, async tx => {
+        const taskRef = doc(this.db, 'shifts', shiftId, 'tasks', taskId), shiftRef = doc(this.db, 'shifts', shiftId);
+        const [taskSnap, shiftSnap] = await Promise.all([tx.get(taskRef), tx.get(shiftRef)]);
+        if (!taskSnap.exists()) throw new Error('La tarea ya no existe.');
+        if (!shiftSnap.exists()) throw new Error('El turno ya no existe.');
+        const t = taskSnap.data(); const previous = t.status || 'pending';
+        const status = previous === 'done' ? 'pending' : 'done';
+        if (status === 'done' && t.requiresPhoto && !t.photoUrl) throw new Error('Esta tarea requiere una foto como evidencia.');
+        const summary = shiftSnap.data().taskSummary || {}; const total = summary.total ?? 0, done = summary.done ?? 0;
+        const delta = (status === 'done' ? 1 : 0) - (previous === 'done' ? 1 : 0);
+        tx.update(taskRef, { status, completedAt: status === 'done' ? serverTimestamp() : null, completedBy: status === 'done' ? uid : null, updatedAt: serverTimestamp() });
+        tx.update(shiftRef, { taskSummary: { total, done: clamp(done + delta, 0, total) }, updatedAt: serverTimestamp() });
+      });
+    } catch (e) { throw new Error(this.dbError(e, 'No se ha podido guardar el cambio.')); }
+  }
+  async saveNote(shiftId, taskId, note) {
+    const { doc, updateDoc, serverTimestamp } = this.F;
+    try { await updateDoc(doc(this.db, 'shifts', shiftId, 'tasks', taskId), { note: note || null, updatedAt: serverTimestamp() }); }
+    catch (e) { throw new Error(this.dbError(e, 'No se ha podido guardar la nota.')); }
+  }
+  async attachPhoto(shiftId, taskId) {
+    const { doc, updateDoc, serverTimestamp } = this.F;
+    try { await updateDoc(doc(this.db, 'shifts', shiftId, 'tasks', taskId), { photoUrl: 'simulada://' + taskId, updatedAt: serverTimestamp() }); }
+    catch (e) { throw new Error(this.dbError(e, 'No se ha podido adjuntar la foto.')); }
+  }
+  async checkIn(shiftId) {
+    const { doc, updateDoc, serverTimestamp } = this.F;
+    try { await updateDoc(doc(this.db, 'shifts', shiftId), { status: 'in_progress', checkInAt: serverTimestamp(), updatedAt: serverTimestamp() }); }
+    catch (e) { throw new Error(this.dbError(e, 'No se ha podido fichar.')); }
+  }
+  async checkOut(shiftId) {
+    const { doc, updateDoc, serverTimestamp } = this.F;
+    try { await updateDoc(doc(this.db, 'shifts', shiftId), { status: 'completed', checkOutAt: serverTimestamp(), updatedAt: serverTimestamp() }); }
+    catch (e) { throw new Error(this.dbError(e, 'No se ha podido fichar.')); }
+  }
+  async sendMessage(text) {
+    const { collection, addDoc, serverTimestamp } = this.F;
+    const me = this.currentUser();
+    try {
+      await addDoc(collection(this.db, 'conversations', 'conv_' + me.elderIds[0], 'messages'), {
+        senderUid: me.uid, senderName: me.displayName, type: 'text', text, readBy: [me.uid], sentAt: serverTimestamp(),
+      });
+    } catch (e) { throw new Error(this.dbError(e, 'No se ha podido enviar el mensaje.')); }
+  }
+  async markAsRead() {
+    const { doc, writeBatch, arrayUnion, serverTimestamp } = this.F;
+    const me = this.currentUser(); if (!isProvisioned(me)) return;
+    const convId = 'conv_' + me.elderIds[0];
+    const unread = this.messagesRaw.filter(m => m.type !== 'system' && !m.pending && !m.readBy.includes(me.uid));
+    const conv = this.conversationDoc;
+    const hasCounter = conv && conv.unread && conv.unread[me.uid];
+    if (!unread.length && !hasCounter) return;
+    try {
+      const batch = writeBatch(this.db);
+      for (const m of unread.slice(0, 200)) batch.update(doc(this.db, 'conversations', convId, 'messages', m.id), { readBy: arrayUnion(me.uid) });
+      if (hasCounter) batch.update(doc(this.db, 'conversations', convId), { [`unread.${me.uid}`]: 0, updatedAt: serverTimestamp() });
+      await batch.commit();
+    } catch (e) { console.warn('[cuidapp] markAsRead', e); }
+  }
+}
+
+/* ================================================================ router */
+const R = { splash: '/', login: '/login', register: '/register', pending: '/pending',
+  family: '/family', cameras: '/family/cameras', familyChat: '/family/chat',
+  caregiver: '/caregiver', caregiverChat: '/caregiver/chat' };
+let stack = [R.splash];
+let lastLoc = null;
+const current = () => stack[stack.length - 1];
+
+function homeFor(user) {
+  if (!user) return R.login;
+  if (user.role === 'family' || user.role === 'admin') return R.family;
+  if (user.role === 'caregiver') return R.caregiver;
+  return R.pending;
+}
+/** Copia del `redirect` de app_router.dart */
+function guard(location) {
+  if (backend.loading) return location === R.splash ? null : R.splash;
+  const user = backend.currentUser();
+  const onAuth = location === R.login || location === R.register || location === R.splash;
+  if (!user) return (onAuth && location !== R.splash) ? null : R.login;
+  if (!isProvisioned(user)) return location === R.pending ? null : R.pending;
+  const home = homeFor(user);
+  if (onAuth || location === R.pending) return home;
+  if (location.startsWith(R.family) && !(user.role === 'family' || user.role === 'admin')) return home;
+  if (location.startsWith(R.caregiver) && user.role !== 'caregiver') return home;
+  return null;
+}
+function go(location, { push = false } = {}) {
+  if (push) stack.push(location); else stack = [location];
+  render();
+}
+function pop() { if (stack.length > 1) stack.pop(); render(); }
+
+/* ============================================================ UI helpers */
+const ui = {
+  login: { isRegister: false, obscure: true, loading: false, name: '', email: '', password: '', errors: {} },
+  chat: { draft: '' },
+  camera: { ready: false, error: null, muted: true, timer: null, raf: null },
+  selectedShiftId: null,
+  dark: null,
+};
+try { ui.dark = JSON.parse(localStorage.getItem('cuidapp_ui_dark') || 'null'); } catch {}
+let snackTimer = null;
+function snack(text) {
+  const el = $('#snackbar');
+  el.textContent = text; el.classList.add('show');
+  clearTimeout(snackTimer);
+  snackTimer = setTimeout(() => el.classList.remove('show'), 4000);
+}
+function appBar({ title, back = false, actions = '', black = false }) {
+  return `<header class="appbar${black ? ' black' : ''}" data-appbar>
+    ${back ? `<button class="iconbtn" data-act="back" title="Atrás">${icon('arrow_back')}</button>` : ''}
+    <div class="title${back ? '' : ' noleading'}">${esc(title)}</div>
+    <div class="actions">${actions}</div>
+  </header>`;
+}
+function field({ name, label, icon: ic, type = 'text', value = '', error, hint, suffix = '', disabled }) {
+  return `<div class="field${error ? ' error' : ''}${value ? ' float' : ''}" data-field="${name}">
+    <div class="box">
+      <span class="ms prefix">${ic}</span>
+      <input name="${name}" type="${type}" value="${esc(value)}" ${disabled ? 'disabled' : ''} autocomplete="off" spellcheck="false" autocapitalize="off">
+      ${suffix}
+    </div>
+    <label>${label}</label>
+    ${error ? `<div class="helper">${esc(error)}</div>` : (hint ? `<div class="hint">${esc(hint)}</div>` : '')}
+  </div>`;
+}
+const progressBar = (ratio, thin) => `<div class="progress${thin ? ' thin' : ''}"><i style="width:${Math.round(clamp(ratio, 0, 1) * 100)}%"></i></div>`;
+const errorText = e => (e && (e.message || String(e))) || 'Error desconocido';
+
+/* =============================================================== pantallas */
+function splashScreen() {
+  return `<div class="body center"><div class="col gap24" style="align-items:center">
+    ${icon('favorite', { fill: 1, size: 64, color: 'var(--primary)' })}
+    <div class="spinner"></div>
+  </div></div>`;
+}
+
+function loginScreen() {
+  const u = ui.login;
+  const dis = u.loading;
+  const typed = u.email.trim();
+  const hint = typed && !typed.includes('@') ? `Se usará ${toEmail(typed)}` : undefined;
+  return `<div class="body center"><form class="col" style="width:100%;max-width:420px;padding:32px 24px" novalidate data-form="login">
+    <div class="center">${icon('favorite', { fill: 1, size: 56, color: 'var(--primary)' })}</div>
+    <div style="height:16px"></div>
+    <h1 class="headline-m bold center">Cuidapp</h1>
+    <div style="height:8px"></div>
+    <p class="body-m muted center">${u.isRegister ? 'Crea tu cuenta para empezar' : 'Cuida de los tuyos, estés donde estés'}</p>
+    <div style="height:32px"></div>
+    ${u.isRegister ? field({ name: 'name', label: 'Nombre y apellidos', icon: 'person', value: u.name, error: u.errors.name, disabled: dis }) : ''}
+    ${field({ name: 'email', label: 'Usuario o correo electrónico', icon: 'alternate_email', type: 'text', value: u.email, error: u.errors.email, hint, disabled: dis })}
+    ${field({ name: 'password', label: 'Contraseña', icon: 'lock', type: u.obscure ? 'password' : 'text', value: u.password, error: u.errors.password, disabled: dis,
+      suffix: `<button type="button" class="iconbtn suffix" data-act="toggle-obscure" tabindex="-1" title="${u.obscure ? 'Mostrar' : 'Ocultar'}">${icon(u.obscure ? 'visibility' : 'visibility_off')}</button>` })}
+    ${u.isRegister ? '' : `<div class="right" style="margin-top:-8px"><button type="button" class="btn text" data-act="forgot" ${dis ? 'disabled' : ''}>¿Has olvidado tu contraseña?</button></div>`}
+    <div style="height:16px"></div>
+    <button class="btn filled block tall" type="submit" ${dis ? 'disabled' : ''}>${dis ? '<span class="spinner small"></span>' : (u.isRegister ? 'Crear cuenta' : 'Entrar')}</button>
+    <div style="height:12px"></div>
+    <button type="button" class="btn text block" data-act="toggle-register" ${dis ? 'disabled' : ''}>${u.isRegister ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}</button>
+  </form></div>`;
+}
+
+function pendingScreen() {
+  return `<div class="body center"><div class="col center" style="padding:32px;align-items:center">
+    ${icon('hourglass_top', { size: 64, color: 'var(--primary)' })}
+    <div style="height:24px"></div>
+    <h2 class="headline-s">Estamos activando tu cuenta</h2>
+    <div style="height:12px"></div>
+    <p class="body-m muted">Nuestro equipo verificará tus datos y te asignará el domicilio correspondiente. Te avisaremos en cuanto esté listo.</p>
+    <div style="height:32px"></div>
+    <button class="btn text" data-act="signout">${icon('logout')}Cerrar sesión</button>
+  </div></div>`;
+}
+
+function familyHome() {
+  const user = backend.currentUser();
+  const shifts = backend.shifts();
+  const now = Date.now();
+  let done = 0, total = 0;
+  for (const s of shifts) { done += s.done; total += s.total; }
+  const unread = backend.unreadCount(user.uid);
+
+  let progressCard;
+  if (backend.errors.shifts) {
+    progressCard = `<div class="card"><div class="tile static"><span class="lead">${icon('cloud_off')}</span><div class="text"><div class="t">No hemos podido cargar el estado de hoy</div><div class="s">${esc(errorText(backend.errors.shifts))}</div></div></div></div>`;
+  } else if (!shifts.length) {
+    progressCard = `<div class="card"><div class="tile static"><span class="lead">${icon('event_busy')}</span><div class="text"><div class="t">Hoy no hay visita programada</div></div></div></div>`;
+  } else {
+    const cur = pickActiveShift(shifts, now);
+    const checkedIn = cur.checkInAt != null;
+    const label = { scheduled: 'El cuidador aún no ha llegado', in_progress: 'Cuidador en el domicilio', completed: 'Visita finalizada', missed: 'Visita no realizada' }[cur.status] || cur.status;
+    progressCard = `<div class="card"><div class="col" style="padding:16px">
+      <div class="row gap8">${icon(checkedIn ? 'how_to_reg' : 'schedule', { color: checkedIn ? 'var(--primary)' : 'var(--outline)' })}<span class="title-m">${label}</span></div>
+      <div style="height:16px"></div>
+      <div class="row gap12">${progressBar(total ? done / total : 0)}<span class="title-m bold">${done}/${total}</span></div>
+      <div style="height:8px"></div>
+      <p class="body-s muted">${shifts.length > 1 ? `tareas completadas · ${shifts.length} visitas hoy` : 'tareas completadas'}</p>
+    </div></div>`;
+  }
+
+  const tile = (ic, t, s, act, badge) => `<div class="card"><div class="tile" data-act="${act}">
+    <span class="lead">${icon(ic, { size: 28 })}</span>
+    <div class="text"><div class="t">${t}</div><div class="s">${s}</div></div>
+    <span class="trail">${badge > 0 ? `<span class="pill">${badge > 99 ? '99+' : badge}</span>` : ''}${icon('chevron_right')}</span>
+  </div></div>`;
+
+  return appBar({ title: 'Hoy', actions: `<button class="iconbtn" data-act="signout" title="Cerrar sesión">${icon('logout')}</button>` }) +
+    `<div class="body"><div style="padding:16px">
+      ${progressCard}
+      <div style="height:12px"></div>
+      ${tile('videocam', 'Ver cámaras', 'Conecta en directo con el domicilio', 'open-cameras', 0)}
+      ${tile('forum', 'Mensajes', 'Escribe instrucciones al cuidador', 'open-chat', unread)}
+      ${tile('checklist', 'Plan de cuidados', 'Añade o modifica tareas del día a día', 'open-plan', 0)}
+    </div></div>`;
+}
+
+function cameraList() {
+  const cams = backend.cameras();
+  let body;
+  if (backend.errors.cameras) {
+    body = `<div class="body center"><p class="body-m center" style="padding:32px">No se han podido cargar: ${esc(errorText(backend.errors.cameras))}</p></div>`;
+  } else if (!cams.length) {
+    body = `<div class="body center"><p class="body-m center" style="padding:32px">Todavía no hay cámaras instaladas en este domicilio.</p></div>`;
+  } else {
+    body = `<div class="body"><div style="padding:12px" class="col gap8">${cams.map(c => {
+      const on = c.status === 'online';
+      return `<div class="card" style="margin:0"><div class="tile${on ? '' : ' static'}" ${on ? `data-act="open-camera" data-arg="${esc(c.id)}"` : ''}>
+        <span class="avatar${on ? '' : ' off'}">${icon(on ? 'videocam' : 'videocam_off')}</span>
+        <div class="text"><div class="t">${esc(c.label)}</div><div class="s" style="color:${on ? 'var(--primary)' : 'var(--error)'};font-size:12px;line-height:16px">${on ? 'En línea' : 'Sin conexión'}</div></div>
+        <span class="trail">${icon('chevron_right')}</span>
+      </div></div>`;
+    }).join('')}</div></div>`;
+  }
+  return appBar({ title: 'Cámaras', back: true }) + body;
+}
+
+function cameraLive(cameraId) {
+  const cam = backend.cameras().find(c => c.id === cameraId);
+  const st = ui.camera;
+  let body;
+  if (st.error) {
+    body = `<div class="col center" style="padding:32px;align-items:center;gap:16px">
+      ${icon('videocam_off', { size: 56, color: 'rgba(255,255,255,.54)' })}
+      <p class="body-m" style="color:rgba(255,255,255,.7)">${esc(st.error)}</p>
+      <button class="btn filled" data-act="camera-retry">Reintentar</button></div>`;
+  } else if (!st.ready) {
+    body = `<div class="col" style="align-items:center;gap:16px"><div class="spinner white"></div><p class="body-m" style="color:rgba(255,255,255,.7)">Conectando con la cámara…</p></div>`;
+  } else {
+    body = `<div class="video-wrap"><canvas id="cam" width="640" height="360"></canvas><div class="scan"></div>
+      <div class="hud"><i></i>EN DIRECTO · ${esc((cam?.label || '').toUpperCase())}</div><div class="ts" id="camTs"></div>
+      <div class="foot">Vídeo simulado · la app real recibe WebRTC (WHEP) desde MediaMTX</div></div>`;
+  }
+  const actions = st.ready ? `<button class="iconbtn" data-act="camera-mute" title="${st.muted ? 'Activar sonido' : 'Silenciar'}">${icon(st.muted ? 'volume_off' : 'volume_up')}</button>` : '';
+  return appBar({ title: 'En directo', back: true, black: true, actions }) + `<div class="body center" style="background:#000">${body}</div>`;
+}
+
+function chatScreen() {
+  const me = backend.currentUser();
+  const msgs = backend.messages();
+  let list;
+  if (backend.errors.messages) {
+    list = `<div class="body center"><p class="body-m center" style="padding:32px">No se han podido cargar los mensajes.<br>${esc(errorText(backend.errors.messages))}</p></div>`;
+  } else if (!msgs.length) {
+    list = `<div class="body center"><div class="empty">${icon('forum')}<div class="title-m">Todavía no hay mensajes</div><p class="body-s">Escribe instrucciones, recordatorios o preguntas. La otra persona recibirá una notificación.</p></div></div>`;
+  } else {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const dayLabel = ms => {
+      const d = new Date(ms); d.setHours(0, 0, 0, 0);
+      const diff = Math.round((today - d) / 86400000);
+      if (diff === 0) return 'Hoy'; if (diff === 1) return 'Ayer';
+      const x = new Date(ms); return `${x.getDate()} de ${MONTHS[x.getMonth()]}`;
+    };
+    let html = '', prev = null;
+    for (const m of msgs) {
+      const newDay = !prev || new Date(prev.sentAt).toDateString() !== new Date(m.sentAt).toDateString();
+      if (newDay) html += `<div class="day-sep"><span>${dayLabel(m.sentAt)}</span></div>`;
+      if (m.type === 'system') { html += `<div class="sys-msg">${esc(m.text)}</div>`; prev = m; continue; }
+      const mine = m.senderUid === me.uid;
+      const showSender = !prev || prev.senderUid !== m.senderUid;
+      const readByOther = m.readBy.length > 1;
+      const tick = m.pending ? icon('schedule') : icon(readByOther ? 'done_all' : 'done', { cls: readByOther ? 'read' : '' });
+      html += `<div class="bubble-row${mine ? ' mine' : ''}"><div class="bubble">
+        ${showSender && !mine ? `<div class="sender">${esc(m.senderName)}</div>` : ''}${esc(m.text)}
+        <div class="meta"><span class="time">${m.pending ? 'Enviando…' : fmtHm(m.sentAt)}</span>${mine ? tick : ''}</div>
+      </div></div>`;
+      prev = m;
+    }
+    list = `<div class="body" id="chatBody"><div class="chat-list">${html}</div></div>`;
+  }
+  return appBar({ title: 'Mensajes', back: true }) + list +
+    `<div class="composer"><div class="tbox"><textarea id="draft" rows="1" maxlength="1000" placeholder="Escribe un mensaje…">${esc(ui.chat.draft)}</textarea></div>
+     <button class="btn icon-filled" data-act="send" title="Enviar">${icon('send')}</button></div>`;
+}
+
+function caregiverHome() {
+  const user = backend.currentUser();
+  const shifts = backend.shifts();
+  const unread = backend.unreadCount(user.uid);
+  const now = Date.now();
+  const bar = appBar({ title: 'Mi jornada', actions:
+    `<button class="iconbtn" data-act="open-chat" title="Mensajes">${icon('forum')}${unread > 0 ? `<span class="badge">${unread > 99 ? '99+' : unread}</span>` : ''}</button>
+     <button class="iconbtn" data-act="signout" title="Cerrar sesión">${icon('logout')}</button>` });
+
+  if (backend.errors.shifts) {
+    return bar + `<div class="body center"><div class="empty">${icon('cloud_off', { cls: 'err' })}<div class="title-m">No hemos podido cargar tu jornada</div><p class="body-s">${esc(errorText(backend.errors.shifts))}</p></div></div>`;
+  }
+  let shift = ui.selectedShiftId ? shifts.find(s => s.id === ui.selectedShiftId) : null;
+  shift ??= pickActiveShift(shifts, now);
+  if (!shift) {
+    return bar + `<div class="body center"><div class="empty">${icon('event_available')}<div class="title-m">Hoy no tienes ningún turno asignado</div><p class="body-s">Si crees que es un error, escribe a coordinación desde el chat.</p></div></div>`;
+  }
+
+  const canEdit = shift.checkInAt != null && shift.status !== 'completed';
+  const selector = shifts.length > 1 ? `<div class="seg">${shifts.map(s =>
+    `<button class="${s.id === shift.id ? 'on' : ''}" data-act="select-shift" data-arg="${esc(s.id)}">${s.status === 'completed' ? icon('check') : ''}${s.scheduledStart ? fmtHm(s.scheduledStart) : 'Visita'}</button>`).join('')}</div>` : '';
+
+  let action;
+  if (shift.checkInAt == null) action = `<button class="btn filled block h48" data-act="checkin">${icon('login')}Fichar entrada</button>`;
+  else if (shift.status !== 'completed') action = `<button class="btn outlined block h48" data-act="checkout">${icon('logout')}Fichar salida</button>`;
+  else action = `<div class="row gap8">${icon('check_circle', { color: 'var(--primary)' })}<span class="body-m">Jornada cerrada</span></div>`;
+
+  const schedule = (shift.scheduledStart && shift.scheduledEnd) ? `${fmtHm(shift.scheduledStart)} – ${fmtHm(shift.scheduledEnd)}` : 'Horario sin definir';
+  const header = `<div class="card" style="margin:12px 12px 4px"><div class="col" style="padding:16px">
+    <div class="row gap12">
+      <span class="avatar">${icon('elderly')}</span>
+      <div class="col spacer" style="min-width:0"><span class="title-m">${esc(shift.elderName)}</span><span class="body-s muted">${schedule}</span></div>
+      <span class="title-l bold primary">${shift.done}/${shift.total}</span>
+    </div>
+    <div style="height:12px"></div>${progressBar(shift.total ? shift.done / shift.total : 0, true)}<div style="height:16px"></div>${action}
+  </div></div>`;
+
+  const grouped = new Map();
+  for (const t of [...shift.tasks].sort((a, b) => a.order - b.order)) {
+    if (!grouped.has(t.category)) grouped.set(t.category, []);
+    grouped.get(t.category).push(t);
+  }
+  let groups = '';
+  for (const [cat, tasks] of grouped) {
+    const c = CATEGORY[cat] || CATEGORY.other;
+    groups += `<div class="cat-header" style="color:${c.color}">${icon(c.icon)}<span>${c.label}</span><span class="count">${tasks.filter(t => t.status === 'done').length}/${tasks.length}</span></div>`;
+    groups += tasks.map(t => taskTile(shift, t, canEdit, now)).join('');
+  }
+  if (!shift.tasks.length && backend.mode === 'firebase' && !backend.tasksByShift[shift.id]) groups = `<div class="body center" style="padding:24px;display:flex;justify-content:center"><div class="spinner"></div></div>`;
+  return bar + `<div class="body">${selector}${header}${groups}<div style="height:96px"></div></div>`;
+}
+
+function taskTile(shift, t, enabled, now) {
+  const c = CATEGORY[t.category] || CATEGORY.other;
+  const overdue = isOverdue(t, now);
+  const skipped = t.status === 'skipped';
+  const resolved = t.status !== 'pending';
+  const chips = [];
+  const chip = (ic, label, color) => `<span class="chip" style="color:${color}">${icon(ic)}${label}</span>`;
+  if (t.scheduledAt != null) chips.push(chip('schedule', fmtHm(t.scheduledAt), overdue ? 'var(--error)' : 'var(--outline)'));
+  if (overdue) chips.push(chip('warning', 'Fuera de hora', 'var(--error)'));
+  if (skipped) chips.push(chip('block', 'No realizada', 'var(--error)'));
+  if (t.requiresPhoto && !t.photoUrl) chips.push(chip('photo_camera', 'Requiere foto', 'var(--tertiary)'));
+  const hasNote = !!(t.note && t.note.length);
+  const canToggle = enabled && !skipped;
+  const arg = `${shift.id}|${t.id}`;
+  return `<div class="task${enabled ? '' : ' disabled'}">
+    <span class="cbwrap${canToggle ? '' : ' off'}" ${canToggle ? `data-act="toggle-task" data-arg="${esc(arg)}"` : ''}><span class="cb${t.status === 'done' ? ' on' : ''}">${t.status === 'done' ? icon('check') : ''}</span></span>
+    <div class="content">
+      <div class="title${resolved ? ' resolved' : ''}${t.isCritical ? ' critical' : ''}">${esc(t.title)}</div>
+      ${chips.length ? `<div class="chips">${chips.join('')}</div>` : ''}
+      ${hasNote ? `<div class="note">${esc(t.note)}</div>` : ''}
+    </div>
+    <div class="secondary">${icon(c.icon, { size: 22, color: c.color, cls: 'cat' })}
+      <button class="iconbtn" title="Añadir nota" ${enabled ? `data-act="open-note" data-arg="${esc(arg)}"` : 'disabled'}>${icon('sticky_note_2', { fill: hasNote ? 1 : 0, color: hasNote ? 'var(--primary)' : 'var(--outline)' })}</button>
+    </div>
+  </div>`;
+}
+
+/* ================================================================ render */
+let renderQueued = false;
+function requestRender() { if (renderQueued) return; renderQueued = true; queueMicrotask(() => { renderQueued = false; render(); }); }
+
+function render() {
+  const redirect = guard(current());
+  if (redirect) stack = [redirect];
+  const loc = current();
+  const app = $('#app');
+  const prevBody = $('.body', app);
+  const keepScroll = prevBody && lastLoc === loc ? prevBody.scrollTop : 0;
+  const activeId = document.activeElement && app.contains(document.activeElement) ? document.activeElement.id : null;
+  const selection = activeId && document.activeElement.selectionStart != null ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
+  stopCamera();
+
+  let html;
+  if (loc === R.splash) html = splashScreen();
+  else if (loc === R.login || loc === R.register) html = loginScreen();
+  else if (loc === R.pending) html = pendingScreen();
+  else if (loc === R.family) html = familyHome();
+  else if (loc === R.cameras) html = cameraList();
+  else if (loc.startsWith(R.cameras + '/')) html = cameraLive(loc.slice(R.cameras.length + 1));
+  else if (loc === R.familyChat || loc === R.caregiverChat) html = chatScreen();
+  else if (loc === R.caregiver) html = caregiverHome();
+  else html = `<div class="body center"><p class="body-m">Ruta no encontrada: ${esc(loc)}</p></div>`;
+
+  const black = loc.startsWith(R.cameras + '/');
+  app.innerHTML = `<div class="route${lastLoc !== loc ? ' anim' : ''}${black ? ' black' : ''}">${html}</div>`;
+
+  const body = $('.body', app), bar = $('[data-appbar]', app);
+  if (body) {
+    body.scrollTop = keepScroll;
+    if (bar) { const sync = () => bar.classList.toggle('scrolled', body.scrollTop > 0); sync(); body.addEventListener('scroll', sync, { passive: true }); }
+  }
+  if (loc === R.familyChat || loc === R.caregiverChat) afterChatRender(lastLoc !== loc);
+  if (black) startCamera();
+  if ((loc === R.login || loc === R.register) && lastLoc !== loc) { const first = $('input', app); if (first && !ui.login.loading) setTimeout(() => first.focus(), 60); }
+  if (activeId && lastLoc === loc) { const el = document.getElementById(activeId); if (el) { el.focus(); if (selection && el.setSelectionRange) try { el.setSelectionRange(selection[0], selection[1]); } catch {} } }
+  lastLoc = loc;
+  updateDemoPanel();
+}
+
+/* ------------------------------------------------------------- chat glue */
+function afterChatRender(fresh) {
+  backend.markAsRead();
+  const body = $('#chatBody'); if (body) body.scrollTop = body.scrollHeight;
+  const ta = $('#draft');
+  if (ta) {
+    const box = ta.parentElement;
+    const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 144) + 'px'; };
+    grow();
+    ta.addEventListener('input', () => { ui.chat.draft = ta.value; grow(); });
+    ta.addEventListener('focus', () => box.classList.add('focus'));
+    ta.addEventListener('blur', () => box.classList.remove('focus'));
+    ta.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.keyCode === 13) && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+    if (fresh) setTimeout(() => ta.focus(), 80);
+  }
+}
+async function sendMessage() {
+  const text = ui.chat.draft.trim();
+  if (!text) return;
+  ui.chat.draft = '';
+  const ta = $('#draft'); if (ta) { ta.value = ''; ta.style.height = 'auto'; }
+  try { await backend.sendMessage(text); } catch (e) { ui.chat.draft = text; snack(e.message); render(); }
+}
+
+/* ----------------------------------------------------------- camera glue */
+function startCamera() {
+  const st = ui.camera;
+  if (!st.ready && !st.error && !st.timer) {
+    st.timer = setTimeout(() => { st.timer = null; st.ready = true; render(); }, 1400 + Math.random() * 600);
+    return;
+  }
+  const canvas = $('#cam'); if (!canvas) return;
+  const camId = current().slice(R.cameras.length + 1);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const t0 = performance.now();
+  const draw = now => {
+    const t = (now - t0) / 1000;
+    drawScene(ctx, W, H, camId, t);
+    const ts = $('#camTs'); if (ts) { const d = new Date(); ts.textContent = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+    st.raf = requestAnimationFrame(draw);
+  };
+  st.raf = requestAnimationFrame(draw);
+}
+function stopCamera() {
+  const st = ui.camera;
+  if (st.raf) cancelAnimationFrame(st.raf);
+  if (st.timer) clearTimeout(st.timer);
+  st.raf = null; st.timer = null;
+  if (!current().startsWith(R.cameras + '/')) { st.ready = false; st.error = null; st.muted = true; }
+}
+function drawScene(ctx, W, H, camId, t) {
+  const flicker = 1 + Math.sin(t * 7.3) * 0.012 + Math.sin(t * 1.7) * 0.01;
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#4a5a52'); g.addColorStop(1, '#232a26');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  if (camId === 'cam_pasillo') {
+    ctx.fillStyle = '#3a3129'; ctx.beginPath(); ctx.moveTo(0, H); ctx.lineTo(W * .36, H * .58); ctx.lineTo(W * .64, H * .58); ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#5b6a62'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(W * .36, H * .22); ctx.lineTo(W * .36, H * .58); ctx.lineTo(0, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#4d5b54'; ctx.beginPath(); ctx.moveTo(W, 0); ctx.lineTo(W * .64, H * .22); ctx.lineTo(W * .64, H * .58); ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#2a3330'; ctx.fillRect(W * .36, H * .22, W * .28, H * .36);
+    ctx.fillStyle = `rgba(255,232,190,${0.75 * flicker})`; ctx.fillRect(W * .44, H * .28, W * .12, H * .30);
+    ctx.strokeStyle = '#1b1f1d'; ctx.lineWidth = 3; ctx.strokeRect(W * .44, H * .28, W * .12, H * .30);
+    for (let i = 0; i < 3; i++) { const x = W * (.08 + i * .09), y = H * (.12 + i * .03); ctx.fillStyle = '#2d2a26'; ctx.fillRect(x, y, W * .05, H * .07); ctx.fillStyle = '#8b96a3'; ctx.fillRect(x + 3, y + 3, W * .05 - 6, H * .07 - 6); }
+    ctx.fillStyle = '#6a5a4b'; ctx.fillRect(W * .74, H * .48, W * .12, H * .05);
+    ctx.fillStyle = '#4a3f35'; ctx.fillRect(W * .75, H * .53, W * .01, H * .2); ctx.fillRect(W * .845, H * .53, W * .01, H * .2);
+  } else {
+    ctx.fillStyle = '#2a2521'; ctx.fillRect(0, H * .64, W, H * .36);
+    ctx.fillStyle = '#5a4c42'; ctx.fillRect(W * .06, H * .70, W * .5, H * .22);
+    ctx.fillStyle = `rgba(150,178,205,${flicker})`; ctx.fillRect(W * .64, H * .12, W * .26, H * .36);
+    ctx.strokeStyle = '#e6dfd3'; ctx.lineWidth = 5; ctx.strokeRect(W * .64, H * .12, W * .26, H * .36);
+    ctx.beginPath(); ctx.moveTo(W * .77, H * .12); ctx.lineTo(W * .77, H * .48); ctx.moveTo(W * .64, H * .30); ctx.lineTo(W * .90, H * .30); ctx.stroke();
+    ctx.fillStyle = '#d9d0c4'; ctx.fillRect(W * .61, H * .10, W * .03, H * .42); ctx.fillRect(W * .90, H * .10, W * .03, H * .42);
+    ctx.fillStyle = '#6b5647'; roundRect(ctx, W * .12, H * .44, W * .40, H * .12, 10); ctx.fill();
+    ctx.fillStyle = '#7a6454'; roundRect(ctx, W * .10, H * .54, W * .44, H * .14, 10); ctx.fill();
+    ctx.fillStyle = '#8c7462'; roundRect(ctx, W * .15, H * .46, W * .14, H * .09, 6); ctx.fill(); roundRect(ctx, W * .33, H * .46, W * .14, H * .09, 6); ctx.fill();
+    ctx.fillStyle = '#3d3a36'; ctx.fillRect(W * .58, H * .55, W * .09, H * .02); ctx.fillRect(W * .62, H * .57, W * .01, H * .12);
+    ctx.fillStyle = `rgba(255,214,150,${0.9 * flicker})`; ctx.beginPath(); ctx.moveTo(W * .90, H * .56); ctx.lineTo(W * .96, H * .56); ctx.lineTo(W * .98, H * .66); ctx.lineTo(W * .88, H * .66); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#3a3532'; ctx.fillRect(W * .928, H * .66, W * .006, H * .2);
+    const glow = ctx.createRadialGradient(W * .93, H * .62, 5, W * .93, H * .62, W * .22); glow.addColorStop(0, `rgba(255,200,120,${0.28 * flicker})`); glow.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#2e2a27'; ctx.fillRect(W * .18, H * .16, W * .12, H * .16); ctx.fillStyle = '#7f8f9c'; ctx.fillRect(W * .19, H * .17, W * .10, H * .14);
+  }
+  const v = ctx.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * .95);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.55)'); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(255,255,255,.06)';
+  for (let i = 0; i < 90; i++) ctx.fillRect(Math.random() * W, Math.random() * H, 2, 1);
+  const band = ((t * 40) % (H + 60)) - 30; ctx.fillStyle = 'rgba(255,255,255,.025)'; ctx.fillRect(0, band, W, 18);
+}
+function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+/* ----------------------------------------------------------- nota (sheet) */
+function openNoteSheet(shiftId, taskId) {
+  const findTask = () => backend.shifts().find(s => s.id === shiftId)?.tasks.find(t => t.id === taskId);
+  const task = findTask();
+  if (!task) return;
+  const scrim = $('#scrim');
+  let draft = task.note || '';
+  const renderSheet = () => {
+    const t = findTask() || task;
+    scrim.innerHTML = `<div class="sheet col" data-sheet>
+      <div class="title-m">${esc(t.title)}</div>
+      <div style="height:4px"></div>
+      <p class="body-s">Lo que escribas aquí lo ve la familia al instante.</p>
+      <div style="height:16px"></div>
+      <textarea id="noteText" maxlength="500" placeholder="Ej.: hoy ha comido poco, se ha quejado de la rodilla…">${esc(draft)}</textarea>
+      <div class="counter"><span id="noteCount">${draft.length}</span>/500</div>
+      ${t.requiresPhoto ? `<div style="height:8px"></div><button class="btn outlined block" data-act="attach-photo" ${t.photoUrl ? 'disabled' : ''}>${icon(t.photoUrl ? 'check_circle' : 'photo_camera')}${t.photoUrl ? 'Foto adjuntada' : 'Adjuntar foto (simulada)'}</button>` : ''}
+      <div style="height:8px"></div>
+      <button class="btn filled block" data-act="save-note">Guardar nota</button>
+    </div>`;
+    const ta = $('#noteText'); ta.addEventListener('input', () => { draft = ta.value; $('#noteCount').textContent = ta.value.length; });
+    setTimeout(() => ta.focus(), 50);
+  };
+  renderSheet();
+  scrim.classList.add('show');
+  scrim.onclick = async e => {
+    const btn = e.target.closest('[data-act]');
+    if (btn) {
+      if (btn.dataset.act === 'attach-photo') {
+        try { await backend.attachPhoto(shiftId, taskId); snack('Foto adjuntada como evidencia.'); } catch (err) { snack(err.message); }
+        renderSheet(); return;
+      }
+      if (btn.dataset.act === 'save-note') {
+        const note = $('#noteText').value.trim();
+        closeSheet();
+        try { await backend.saveNote(shiftId, taskId, note); } catch (err) { snack(err.message); }
+        return;
+      }
+    }
+    if (!e.target.closest('[data-sheet]')) closeSheet();
+  };
+}
+function closeSheet() { const s = $('#scrim'); s.classList.remove('show'); s.innerHTML = ''; s.onclick = null; }
+
+/* ============================================================== acciones */
+function activeShift() {
+  const shifts = backend.shifts();
+  return (ui.selectedShiftId && shifts.find(s => s.id === ui.selectedShiftId)) || pickActiveShift(shifts, Date.now());
+}
+async function run(fn) { try { await fn(); } catch (e) { snack(e.message || 'No se ha podido guardar.'); } }
+
+async function submitLogin() {
+  const u = ui.login;
+  u.errors = {};
+  if (u.isRegister && u.name.trim().length < 3) u.errors.name = 'Introduce tu nombre completo';
+  const le = loginError(u.email); if (le) u.errors.email = le;
+  if (u.password.length < 6) u.errors.password = 'Mínimo 6 caracteres';
+  if (Object.keys(u.errors).length) { render(); return; }
+
+  u.loading = true; render();
+  try {
+    if (u.isRegister) await backend.register(u.name, u.email, u.password);
+    else await backend.signIn(u.email, u.password);
+    u.password = ''; u.errors = {};
+  } catch (e) {
+    snack(e.message || 'Ha ocurrido un error.');
+  } finally {
+    u.loading = false; render();
+  }
+}
+
+/* =============================================================== eventos */
+$('#app').addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const act = el.dataset.act, arg = el.dataset.arg;
+  switch (act) {
+    case 'back': pop(); break;
+    case 'signout': ui.selectedShiftId = null; run(() => backend.signOut()); break;
+    case 'toggle-obscure': ui.login.obscure = !ui.login.obscure; syncLoginInputs(); render(); break;
+    case 'toggle-register': syncLoginInputs(); ui.login.isRegister = !ui.login.isRegister; ui.login.errors = {}; stack = [ui.login.isRegister ? R.register : R.login]; render(); break;
+    case 'forgot': {
+      syncLoginInputs();
+      if (!ui.login.email.trim()) { snack('Escribe tu correo para enviarte el enlace.'); break; }
+      run(async () => { await backend.resetPassword(ui.login.email); snack('Si el correo existe, recibirás un enlace.'); });
+      break;
+    }
+    case 'open-cameras': go(R.cameras, { push: true }); break;
+    case 'open-camera': go(R.cameras + '/' + arg, { push: true }); break;
+    case 'open-chat': go(backend.currentUser().role === 'caregiver' ? R.caregiverChat : R.familyChat, { push: true }); break;
+    case 'open-plan': snack('Editor del plan de cuidados: pendiente en la app.'); break;
+    case 'camera-mute': ui.camera.muted = !ui.camera.muted; render(); break;
+    case 'camera-retry': ui.camera.error = null; ui.camera.ready = false; render(); break;
+    case 'send': sendMessage(); break;
+    case 'select-shift': ui.selectedShiftId = arg; render(); break;
+    case 'checkin': { const s = activeShift(); if (s) run(() => backend.checkIn(s.id)); break; }
+    case 'checkout': { const s = activeShift(); if (s) run(() => backend.checkOut(s.id)); break; }
+    case 'toggle-task': { const [sid, tid] = arg.split('|'); run(() => backend.toggleTask(sid, tid)); break; }
+    case 'open-note': { const [sid, tid] = arg.split('|'); openNoteSheet(sid, tid); break; }
+  }
+});
+$('#app').addEventListener('submit', e => {
+  if (e.target.dataset.form !== 'login') return;
+  e.preventDefault();
+  if (ui.login.loading) return;
+  syncLoginInputs();
+  submitLogin();
+});
+function syncLoginInputs() {
+  for (const inp of $$('form[data-form="login"] input')) ui.login[inp.name] = inp.value;
+}
+$('#app').addEventListener('keydown', e => {
+  if (!(e.key === 'Enter' || e.keyCode === 13) || e.target.tagName !== 'INPUT') return;
+  const form = e.target.closest('form[data-form="login"]'); if (!form) return;
+  e.preventDefault(); form.requestSubmit();
+});
+$('#app').addEventListener('focusin', e => { const f = e.target.closest('.field'); if (f && e.target.tagName === 'INPUT') f.classList.add('focus'); });
+$('#app').addEventListener('focusout', e => { const f = e.target.closest('.field'); if (f && e.target.tagName === 'INPUT') { f.classList.remove('focus'); f.classList.toggle('float', !!e.target.value); } });
+$('#app').addEventListener('input', e => {
+  const f = e.target.closest('.field'); if (!f) return;
+  f.classList.toggle('float', !!e.target.value);
+  if (e.target.name) ui.login[e.target.name] = e.target.value;
+  if (e.target.name === 'email') {
+    const hintEl = f.querySelector('.hint'); const v = e.target.value.trim();
+    const text = v && !v.includes('@') ? `Se usará ${toEmail(v)}` : '';
+    if (hintEl) { hintEl.textContent = text; hintEl.hidden = !text; }
+    else if (text && !f.querySelector('.helper')) { const d = document.createElement('div'); d.className = 'hint'; d.textContent = text; f.appendChild(d); }
+  }
+});
+
+/* ---------------------------------------------------------- panel demo */
+function applyTheme() {
+  const dark = ui.dark ?? window.matchMedia('(prefers-color-scheme: dark)').matches;
+  $('#phoneInner').dataset.theme = dark ? 'dark' : 'light';
+  $('#darkIcon').textContent = dark ? 'light_mode' : 'dark_mode';
+  $('#darkLabel').textContent = dark ? 'Modo claro' : 'Modo oscuro';
+}
+function updateDemoPanel() {
+  const fb = backend.mode === 'firebase';
+  const chip = $('#modeChip');
+  chip.className = 'mode ' + (fb ? 'firebase' : 'local');
+  chip.innerHTML = fb ? `${icon('cloud_done')} Conectado a Firebase · ${esc(backend.config.projectId || '')}` : `${icon('storage')} Demo local (sin base de datos)`;
+  $('#modeText').textContent = fb
+    ? 'Los datos viven en Firestore y Firebase Auth, con las mismas reglas de seguridad que la app móvil. Lo que hagas aquí lo verá cualquier otro navegador al instante.'
+    : (window.CUIDAPP_INIT_ERROR ? `No se pudo conectar con Firebase (${window.CUIDAPP_INIT_ERROR}). Los datos viven solo en este navegador y se regeneran cada día.` : 'Los datos viven solo en este navegador y se regeneran cada día, como hace la función nocturna de turnos de la app real.');
+
+  const accounts = fb
+    ? [['Familiar', 'test', 'cuidapp123'], ['Cuidadora', 'ana', 'cuidapp123']]
+    : [['Familiar', 'test', 'cuidapp123'], ['Familiar', 'lucia@example.com', 'test1234'], ['Cuidadora', 'ana@example.com', 'test1234']];
+  $('#accountsTable').innerHTML = accounts.map(([r, u, p]) => `<tr><td>${r}</td><td><code>${esc(u)}</code> · <code>${esc(p)}</code></td></tr>`).join('');
+  $('#loginButtons').innerHTML = accounts.filter((a, i) => fb || i !== 1).map(([r, u, p]) =>
+    `<button class="accent" data-demo="login" data-user="${esc(u)}" data-pass="${esc(p)}">${icon(r === 'Familiar' ? 'family_restroom' : 'medical_services')}Entrar como ${esc(u.split('@')[0])}</button>`).join('');
+
+  $('#resetBtn').hidden = fb;
+  const u = backend.currentUser();
+  const pending = !!(u && !isProvisioned(u));
+  $('#pendingTools').hidden = !pending;
+  if (pending) {
+    $('#pendingText').textContent = fb
+      ? 'Esta cuenta está pendiente de aprobación. En Firebase la activa el backend (función provisionUser o el script de siembra); el cliente no puede asignarse un rol.'
+      : 'Esta cuenta está pendiente de aprobación. En producción la activa la función provisionUser; aquí puedes simularlo:';
+    $('#pendingActions').hidden = fb;
+  }
+  const roleName = { family: 'familiar', caregiver: 'cuidadora', admin: 'admin', unknown: 'pendiente' };
+  $('#demoStatus').innerHTML = u
+    ? `Sesión: <b>${esc(u.displayName)}</b> (${roleName[u.role] || esc(u.role)}) · pantalla <b>${esc(current())}</b>`
+    : `Sin sesión · pantalla <b>${esc(current())}</b>`;
+  $('#hintText').textContent = `Puedes entrar con un usuario corto: "test" equivale a test@${USERNAME_DOMAIN}. Marca tareas o ficha como cuidadora y vuelve a entrar como familiar: el panel refleja el mismo estado.`;
+}
+document.querySelector('.demo-panel').addEventListener('click', e => {
+  const btn = e.target.closest('[data-demo]'); if (!btn) return;
+  switch (btn.dataset.demo) {
+    case 'login': {
+      ui.login.loading = false; ui.login.errors = {}; ui.login.password = ''; ui.login.email = ''; ui.selectedShiftId = null;
+      run(async () => { if (backend.currentUser()) await backend.signOut(); await backend.signIn(btn.dataset.user, btn.dataset.pass); });
+      break;
+    }
+    case 'dark': ui.dark = !(ui.dark ?? window.matchMedia('(prefers-color-scheme: dark)').matches); try { localStorage.setItem('cuidapp_ui_dark', JSON.stringify(ui.dark)); } catch {} applyTheme(); break;
+    case 'reset': if (backend.mode === 'local') { ui.selectedShiftId = null; backend.reset(); snack('Datos de la demo regenerados.'); } break;
+    case 'approve-family': case 'approve-caregiver':
+      if (backend.mode === 'local') backend.approve(btn.dataset.demo === 'approve-family' ? 'family' : 'caregiver');
+      break;
+  }
+});
+
+/* ================================================================= boot */
+function tickClock() { const d = new Date(); $('#clock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+let backend;
+async function boot() {
+  applyTheme();
+  tickClock(); setInterval(tickClock, 15000);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+  if (FIREBASE_CONFIG) {
+    backend = new FirebaseBackend(FIREBASE_CONFIG, requestRender);
+    render();
+    try { await backend.init(); return; }
+    catch (e) {
+      console.error('[cuidapp] Firebase no disponible, usando demo local', e);
+      window.CUIDAPP_INIT_ERROR = e && e.message ? e.message : String(e);
+    }
+  }
+  backend = new LocalBackend(requestRender);
+  render();
+  await backend.init();
+}
+boot();
+})();
+</script>
+</body>
+</html>
