@@ -1,4 +1,10 @@
 .claude/
 *.log
+
+# Claves y documentos privados: este repositorio es PÚBLICO
+0_admin/
+*.p8
+*.p12
+*.mobileprovision
 Thumbs.db
 .DS_Store
