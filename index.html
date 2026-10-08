@@ -195,6 +195,36 @@ body{
 .field .helper{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--error);padding:4px 16px 0}
 .field .hint{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--on-surface-variant);padding:4px 16px 0}
 
+/* ------------------------------------------------------- plan de cuidados */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;
+  border:1px solid var(--outline);background:transparent;color:var(--on-surface);
+  font:500 14px/20px Roboto,system-ui,sans-serif;cursor:pointer;
+}
+.chip .ms{font-size:18px}
+.chip.on{background:var(--secondary-container);border-color:transparent;color:var(--on-secondary-container)}
+.chip.day{width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
+.chip:disabled{opacity:.5;cursor:default}
+.section-title{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--primary);margin:20px 0 10px}
+.switch-row{display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;user-select:none}
+.switch-row .text{flex:1;min-width:0}
+.switch-row .t{font-size:16px;line-height:24px}
+.switch-row .s{font-size:13px;line-height:18px;color:var(--on-surface-variant)}
+.switch{width:52px;height:32px;border-radius:16px;border:2px solid var(--outline);background:var(--surface-container-highest);position:relative;flex:none;transition:background .15s}
+.switch::after{content:"";position:absolute;top:6px;left:6px;width:16px;height:16px;border-radius:50%;background:var(--outline);transition:all .15s}
+.switch.on{background:var(--primary);border-color:var(--primary)}
+.switch.on::after{top:2px;left:22px;width:24px;height:24px;background:var(--on-primary)}
+.fab{
+  position:absolute;right:16px;bottom:16px;z-index:3;height:56px;padding:0 20px;border-radius:16px;border:0;
+  background:var(--primary-container);color:var(--on-primary-container);font:500 14px/20px Roboto,system-ui,sans-serif;
+  display:inline-flex;align-items:center;gap:10px;box-shadow:0 3px 8px rgba(0,0,0,.3);cursor:pointer;
+}
+.info-card{display:flex;gap:12px;margin:4px 4px 8px;padding:14px 16px;border-radius:16px;background:var(--secondary-container);color:var(--on-secondary-container);font-size:14px;line-height:20px}
+.days-row{display:flex;align-items:center;gap:4px;margin-top:6px;flex-wrap:wrap}
+.days-row .label{margin-left:auto;font-size:12px;color:var(--on-surface-variant)}
+.form-error{font-size:12px;line-height:16px;color:var(--error);padding:4px 0 0}
+
 /* --------------------------------------------------------------- checkbox */
 .cbwrap{width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;border-radius:50%}
 .cbwrap:hover{background:color-mix(in srgb,var(--on-surface) 8%,transparent)}
@@ -449,6 +479,43 @@ function pickActiveShift(shifts, now) {
 }
 const isOverdue = (t, now) => t.status === 'pending' && t.scheduledAt != null && now > t.scheduledAt;
 
+/* ------------------------------------------- plan de cuidados: utilidades
+   Las mismas reglas que la app (lib/features/care_plan): hora "HH:mm" con
+   ceros, días ISO 1-7, y el orden de presentación. Las reglas de Firestore
+   rechazan cualquier otra forma. */
+const CATEGORY_ORDER = ['medication', 'meal', 'hygiene', 'cleaning', 'mobility', 'companionship', 'other'];
+const WEEKDAY_INITIALS = { 1: 'L', 2: 'M', 3: 'X', 4: 'J', 5: 'V', 6: 'S', 7: 'D' };
+const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
+const WORK_DAYS = [1, 2, 3, 4, 5];
+function normalizeTime(raw) {
+  const m = /^\s*(\d{1,2}):(\d{2})\s*$/.exec(String(raw ?? ''));
+  if (!m) return null;
+  const h = Number(m[1]), min = Number(m[2]);
+  return h > 23 || min > 59 ? null : `${pad(h)}:${pad(min)}`;
+}
+function normalizeDays(days) {
+  return [...new Set((Array.isArray(days) ? days : []).map(Number).filter(d => Number.isInteger(d) && d >= 1 && d <= 7))].sort((a, b) => a - b);
+}
+function weekdaysLabel(days) {
+  const d = normalizeDays(days);
+  const same = list => d.length === list.length && d.every(x => list.includes(x));
+  if (!d.length) return 'Ningún día';
+  if (d.length === 7) return 'Todos los días';
+  if (same(WORK_DAYS)) return 'De lunes a viernes';
+  if (same([6, 7])) return 'Fines de semana';
+  const ini = d.map(x => WEEKDAY_INITIALS[x]);
+  return ini.length === 1 ? ini[0] : `${ini.slice(0, -1).join(', ')} y ${ini[ini.length - 1]}`;
+}
+function sortPlan(list) {
+  return [...list].sort((a, b) => {
+    if ((a.active !== false) !== (b.active !== false)) return a.active !== false ? -1 : 1;
+    const byTime = (a.timeOfDay || '99:99').localeCompare(b.timeOfDay || '99:99');
+    return byTime || (a.order ?? 0) - (b.order ?? 0);
+  });
+}
+/** Lunes = 1 … domingo = 7, como el generador de turnos. */
+const isoWeekday = (d = new Date()) => ((d.getDay() + 6) % 7) + 1;
+
 /* ====================================================== backend: local */
 // Mismo cuadrante y plan de cuidados que functions/scripts/seed.mjs
 const ASSIGNMENTS = [
@@ -471,11 +538,20 @@ const LOCAL_USERS = [
   { uid: 'caregiver_ana', email: 'ana@example.com',          password: 'test1234',   displayName: 'Ana Ruiz',          role: 'caregiver', elderIds: [ELDER_ID] },
 ];
 
+/** Plan inicial de la demo local: el mismo que siembra functions/scripts/seed-production.mjs. */
+function defaultPlan() {
+  return CARE_PLAN.map(t => ({
+    id: t.id, title: t.title, description: null, category: t.category, order: t.order,
+    timeOfDay: t.timeOfDay || null, weekdays: [...ALL_DAYS],
+    requiresPhoto: !!t.requiresPhoto, isCritical: !!t.isCritical, active: true,
+  }));
+}
+
 /** Reparto de plantillas entre turnos: copia de templatesForAssignment() de generate-shifts.ts */
-function templatesFor(assignment) {
+function templatesFor(assignment, templates) {
   const isFirst = ASSIGNMENTS[0].id === assignment.id;
   const isLast = ASSIGNMENTS[ASSIGNMENTS.length - 1].id === assignment.id;
-  return CARE_PLAN.filter(t => {
+  return templates.filter(t => {
     if (!t.timeOfDay) return isFirst;
     const fits = t.timeOfDay >= assignment.start && t.timeOfDay <= assignment.end;
     if (fits) return true;
@@ -484,9 +560,12 @@ function templatesFor(assignment) {
   });
 }
 
-/** Genera el estado del día. Es "consciente de la hora" para que la demo sea coherente a cualquier hora. */
-function seedLocal() {
+/** Genera el estado del día. Es "consciente de la hora" para que la demo sea coherente a cualquier hora.
+ *  [savedPlan] = plan editado por el usuario en días anteriores; las tareas de hoy salen de él. */
+function seedLocal(savedPlan) {
   const now = new Date();
+  const carePlan = Array.isArray(savedPlan) ? savedPlan : defaultPlan();
+  const todays = carePlan.filter(t => t.active !== false && normalizeDays(t.weekdays).includes(isoWeekday(now)));
   const h = now.getHours() + now.getMinutes() / 60;
   const T = hhmm => atTime(hhmm, now);
   const hOf = hhmm => { const [a, b] = hhmm.split(':').map(Number); return a + b / 60; };
@@ -501,7 +580,7 @@ function seedLocal() {
       if (h >= 14)   { status = 'completed';   checkOutAt = T('13:58'); }
     } else if (h >= 16.56) { status = 'in_progress'; checkInAt = T('16:33'); }
 
-    const tasks = templatesFor(a).map(t => {
+    const tasks = templatesFor(a, todays).map(t => {
       let done = false;
       if (status === 'completed') done = true;
       else if (status === 'in_progress') done = t.timeOfDay ? h >= hOf(t.timeOfDay) + 0.12 : h >= 12.2;
@@ -551,7 +630,7 @@ function seedLocal() {
     }
   }
   return {
-    date: todayStr(now), users, shifts,
+    date: todayStr(now), users, shifts, carePlan,
     cameras: [
       { id: 'cam_salon',   label: 'Salón',   status: 'online', hasAudio: true, supportsTwoWayAudio: true },
       { id: 'cam_pasillo', label: 'Pasillo', status: 'online', hasAudio: true, supportsTwoWayAudio: false },
@@ -573,8 +652,10 @@ class LocalBackend {
   async init() {
     try {
       const stored = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || 'null');
-      this.db = (stored && stored.date === todayStr()) ? stored : seedLocal();
+      // Un día nuevo regenera turnos y tareas, pero conserva el plan editado.
+      this.db = (stored && stored.date === todayStr()) ? stored : seedLocal(stored && stored.carePlan);
     } catch { this.db = seedLocal(); }
+    this.db.carePlan ??= defaultPlan();
     try { this.session = JSON.parse(localStorage.getItem(this.SESSION_KEY) || 'null') || {}; } catch { this.session = {}; }
     this.session.userEmail ??= null;
     this.save();
@@ -621,6 +702,18 @@ class LocalBackend {
     return u.role === 'caregiver' ? this.db.shifts.filter(s => s.caregiverUid === u.uid) : this.db.shifts;
   }
   cameras() { return this.db.cameras; }
+  carePlan() { return sortPlan(this.db.carePlan || []); }
+  async saveTemplate(t) {
+    await sleep(250);
+    const id = t.id || 'p_' + Date.now().toString(36);
+    this.db.carePlan = (this.db.carePlan || []).filter(x => x.id !== id).concat({ ...t, id });
+    this.save(); this.onChange();
+  }
+  async deleteTemplate(id) {
+    await sleep(250);
+    this.db.carePlan = (this.db.carePlan || []).filter(x => x.id !== id);
+    this.save(); this.onChange();
+  }
   messages() { return this.db.conversation.messages; }
   unreadCount(uid) { return this.db.conversation.messages.filter(m => m.type !== 'system' && m.senderUid !== uid && !m.readBy.includes(uid)).length; }
   find(shiftId, taskId) {
@@ -679,6 +772,7 @@ class FirebaseBackend {
     this.errors = {};
     this.authUser = null; this.profile = null;
     this.shiftsRaw = []; this.tasksByShift = {}; this.camerasRaw = []; this.messagesRaw = []; this.conversationDoc = null;
+    this.planRaw = [];
     this.profileSub = null; this.dataSubs = []; this.taskSubs = {}; this.dataKey = null;
   }
   async init() {
@@ -720,6 +814,7 @@ class FirebaseBackend {
     for (const id of Object.keys(this.taskSubs)) this.taskSubs[id]();
     this.dataSubs = []; this.taskSubs = {}; this.dataKey = null;
     this.shiftsRaw = []; this.tasksByShift = {}; this.camerasRaw = []; this.messagesRaw = []; this.conversationDoc = null;
+    this.planRaw = [];
   }
   subscribeData() {
     const u = this.currentUser();
@@ -747,6 +842,13 @@ class FirebaseBackend {
         this.camerasRaw = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.label).localeCompare(String(b.label)));
         this.onChange();
       }, fail('cameras')));
+
+      // Plan de cuidados: lo lee todo el equipo, pero solo la familia lo edita.
+      this.dataSubs.push(onSnapshot(collection(this.db, 'elders', elderId, 'carePlan'), snap => {
+        delete this.errors.plan;
+        this.planRaw = snap.docs.map(d => this.mapTemplate(d));
+        this.onChange();
+      }, fail('plan')));
     }
 
     const convRef = doc(this.db, 'conversations', 'conv_' + elderId);
@@ -826,6 +928,41 @@ class FirebaseBackend {
   async resetPassword(login) { try { await this.A.sendPasswordResetEmail(this.auth, toEmail(login)); } catch (e) { throw new Error(this.authError(e)); } }
   shifts() { return this.shiftsRaw.map(s => ({ ...s, tasks: this.tasksByShift[s.id] || [] })); }
   cameras() { return this.camerasRaw; }
+  carePlan() { return sortPlan(this.planRaw); }
+  mapTemplate(d) {
+    const x = d.data();
+    return {
+      id: d.id, title: x.title || '', description: x.description || null,
+      category: CATEGORY[x.category] ? x.category : 'other', order: Number.isInteger(x.order) ? x.order : 0,
+      timeOfDay: normalizeTime(x.timeOfDay), weekdays: normalizeDays(x.weekdays),
+      requiresPhoto: !!x.requiresPhoto, isCritical: !!x.isCritical, active: x.active !== false,
+    };
+  }
+  /** Misma forma que escribe la app (carePlanToMap) y que validan las reglas. */
+  async saveTemplate(t) {
+    const { collection, doc, addDoc, setDoc, serverTimestamp } = this.F;
+    const me = this.currentUser();
+    const col = collection(this.db, 'elders', me.elderIds[0], 'carePlan');
+    const data = {
+      title: t.title.trim(), description: t.description ? t.description.trim() || null : null,
+      category: t.category, order: Math.trunc(t.order), timeOfDay: normalizeTime(t.timeOfDay),
+      weekdays: normalizeDays(t.weekdays), requiresPhoto: !!t.requiresPhoto, isCritical: !!t.isCritical,
+      active: t.active !== false, updatedBy: me.uid, updatedAt: serverTimestamp(),
+    };
+    try {
+      if (t.id) await setDoc(doc(col, t.id), data);
+      else await addDoc(col, data);
+    } catch (e) { throw new Error(this.planError(e)); }
+  }
+  async deleteTemplate(id) {
+    const { doc, deleteDoc } = this.F;
+    try { await deleteDoc(doc(this.db, 'elders', this.currentUser().elderIds[0], 'carePlan', id)); }
+    catch (e) { throw new Error(this.planError(e)); }
+  }
+  planError(e) {
+    if (e && e.code === 'permission-denied') return 'Solo la familia puede cambiar el plan de cuidados.';
+    return this.dbError(e, 'No se ha podido guardar el plan de cuidados.');
+  }
   messages() { return this.messagesRaw; }
   unreadCount(uid) { return this.messagesRaw.filter(m => m.type !== 'system' && m.senderUid !== uid && !m.readBy.includes(uid)).length; }
   async toggleTask(shiftId, taskId) {
@@ -894,7 +1031,8 @@ class FirebaseBackend {
 }
 
 /* ================================================================ router */
-const R = { splash: '/', login: '/login', register: '/register', pending: '/pending',
+const R = { plan: '/family/plan', planEdit: '/family/plan/edit',
+  splash: '/', login: '/login', register: '/register', pending: '/pending',
   family: '/family', cameras: '/family/cameras', familyChat: '/family/chat',
   caregiver: '/caregiver', caregiverChat: '/caregiver/chat' };
 let stack = [R.splash];
@@ -949,11 +1087,11 @@ function appBar({ title, back = false, actions = '', black = false }) {
     <div class="actions">${actions}</div>
   </header>`;
 }
-function field({ name, label, icon: ic, type = 'text', value = '', error, hint, suffix = '', disabled }) {
+function field({ name, label, icon: ic, type = 'text', value = '', error, hint, suffix = '', disabled, maxlength }) {
   return `<div class="field${error ? ' error' : ''}${value ? ' float' : ''}" data-field="${name}">
     <div class="box">
       <span class="ms prefix">${ic}</span>
-      <input name="${name}" type="${type}" value="${esc(value)}" ${disabled ? 'disabled' : ''} autocomplete="off" spellcheck="false" autocapitalize="off">
+      <input id="f_${name}" name="${name}" type="${type}" value="${esc(value)}" ${disabled ? 'disabled' : ''} ${maxlength ? `maxlength="${maxlength}"` : ''} autocomplete="off" spellcheck="false" autocapitalize="off">
       ${suffix}
     </div>
     <label>${label}</label>
@@ -1226,6 +1364,8 @@ function render() {
   else if (loc === R.login || loc === R.register) html = loginScreen();
   else if (loc === R.pending) html = pendingScreen();
   else if (loc === R.family) html = familyHome();
+  else if (loc === R.plan) html = carePlanScreen();
+  else if (loc === R.planEdit) html = ui.plan ? carePlanEditScreen() : carePlanScreen();
   else if (loc === R.cameras) html = cameraList();
   else if (loc.startsWith(R.cameras + '/')) html = cameraLive(loc.slice(R.cameras.length + 1));
   else if (loc === R.familyChat || loc === R.caregiverChat) html = chatScreen();
@@ -1383,6 +1523,136 @@ function openNoteSheet(shiftId, taskId) {
 }
 function closeSheet() { const s = $('#scrim'); s.classList.remove('show'); s.innerHTML = ''; s.onclick = null; }
 
+/* ====================================================== plan de cuidados */
+function carePlanScreen() {
+  const plan = backend.carePlan();
+  const info = `<div class="info-card">${icon('info')}<div>Estas tareas se convierten cada día en la lista de la cuidadora.
+    Los cambios se aplican a las visitas que se programen a partir de ahora; las ya programadas no cambian,
+    para no perder lo que ya está marcado.</div></div>`;
+  let content;
+  if (backend.errors.plan) {
+    content = `<div class="empty">${icon('cloud_off', { cls: 'err' })}<div class="title-m">No hemos podido cargar el plan de cuidados</div><p class="body-s">${esc(errorText(backend.errors.plan))}</p></div>`;
+  } else if (!plan.length) {
+    content = `<div class="empty">${icon('checklist')}<div class="title-m">El plan está vacío</div><p class="body-s">Añade las tareas que la cuidadora debe hacer en cada visita: medicación, comidas, aseo, paseos…</p></div>`;
+  } else {
+    content = plan.map(t => {
+      const c = CATEGORY[t.category] || CATEGORY.other;
+      const sub = `${t.timeOfDay || 'Durante la visita'} · ${weekdaysLabel(t.weekdays)}${t.active ? '' : ' · Desactivada'}`;
+      return `<div class="card" style="${t.active ? '' : 'opacity:.55'}"><div class="tile" data-act="plan-edit" data-arg="${esc(t.id)}">
+        <span class="avatar" style="background:color-mix(in srgb, ${c.color} 15%, transparent);color:${c.color}">${icon(c.icon)}</span>
+        <div class="text"><div class="t"${t.isCritical ? ' style="font-weight:600"' : ''}>${esc(t.title)}</div><div class="s">${esc(sub)}</div></div>
+        <span class="trail">${t.isCritical ? icon('priority_high', { color: 'var(--error)' }) : ''}${t.requiresPhoto ? icon('photo_camera', { color: 'var(--tertiary)' }) : ''}${icon('chevron_right')}</span>
+      </div></div>`;
+    }).join('');
+  }
+  return appBar({ title: 'Plan de cuidados', back: true }) +
+    `<div class="body"><div style="padding:8px 12px 96px">${info}${content}</div></div>
+     <button class="fab" data-act="plan-new">${icon('add')}Añadir tarea</button>`;
+}
+
+function openPlanEditor(id) {
+  const plan = backend.carePlan();
+  const t = id ? plan.find(x => x.id === id) : null;
+  const nextOrder = plan.reduce((m, x) => Math.max(m, x.order || 0), 0) + 1;
+  ui.plan = t
+    ? { id: t.id, title: t.title, description: t.description || '', category: t.category, hasTime: !!t.timeOfDay,
+        time: t.timeOfDay || '09:00', days: normalizeDays(t.weekdays), requiresPhoto: t.requiresPhoto, isCritical: t.isCritical,
+        active: t.active, order: t.order, errors: {}, saving: false }
+    : { id: null, title: '', description: '', category: 'other', hasTime: false, time: '09:00', days: [...ALL_DAYS],
+        requiresPhoto: false, isCritical: false, active: true, order: nextOrder, errors: {}, saving: false };
+  go(R.planEdit, { push: true });
+}
+
+function carePlanEditScreen() {
+  const p = ui.plan;
+  const dis = p.saving;
+  const sw = (key, title, sub) => `<div class="switch-row" data-act="plan-toggle" data-arg="${key}">
+      <div class="text"><div class="t">${title}</div><div class="s">${sub}</div></div>
+      <span class="switch${p[key] ? ' on' : ''}" role="switch" aria-checked="${!!p[key]}"></span></div>`;
+  const cats = CATEGORY_ORDER.map(k => {
+    const c = CATEGORY[k];
+    return `<button class="chip${p.category === k ? ' on' : ''}" data-act="plan-cat" data-arg="${k}" ${dis ? 'disabled' : ''}>${icon(c.icon, { color: c.color })}${c.label}</button>`;
+  }).join('');
+  const days = ALL_DAYS.map(d => `<button class="chip day${p.days.includes(d) ? ' on' : ''}" data-act="plan-day" data-arg="${d}" ${dis ? 'disabled' : ''}>${WEEKDAY_INITIALS[d]}</button>`).join('');
+  const actions = p.id ? `<button class="iconbtn" data-act="plan-delete" title="Eliminar" ${dis ? 'disabled' : ''}>${icon('delete')}</button>` : '';
+
+  return appBar({ title: p.id ? 'Editar tarea' : 'Nueva tarea', back: true, actions }) +
+    `<div class="body"><div style="padding:12px 16px 32px">
+      ${field({ name: 'planTitle', label: 'Tarea', icon: 'edit_note', value: p.title, error: p.errors.title, disabled: dis, maxlength: 80 })}
+      ${field({ name: 'planDesc', label: 'Detalles (opcional)', icon: 'notes', value: p.description, disabled: dis, maxlength: 300 })}
+      <div class="section-title">Categoría</div>
+      <div class="chips">${cats}</div>
+      <div class="section-title">Hora</div>
+      ${sw('hasTime', 'A una hora concreta', p.hasTime ? 'Si pasa la hora sin hacerla, se marca como fuera de hora' : 'Se hace en algún momento de la visita')}
+      ${p.hasTime ? field({ name: 'planTime', label: 'Hora', icon: 'schedule', type: 'time', value: p.time, error: p.errors.time, disabled: dis }) : ''}
+      <div class="section-title">Días</div>
+      <div class="chips">${days}</div>
+      <div class="days-row">
+        <button class="btn text" data-act="plan-days" data-arg="all" ${dis ? 'disabled' : ''}>Todos</button>
+        <button class="btn text" data-act="plan-days" data-arg="work" ${dis ? 'disabled' : ''}>Lunes a viernes</button>
+        <span class="label">${weekdaysLabel(p.days)}</span>
+      </div>
+      ${p.errors.days ? `<div class="form-error">${esc(p.errors.days)}</div>` : ''}
+      <div style="height:12px;border-bottom:1px solid var(--outline-variant);margin-bottom:8px"></div>
+      ${sw('isCritical', 'Tarea crítica', 'Si queda sin hacer al cerrar la visita, se avisa a la familia.')}
+      ${sw('requiresPhoto', 'Requiere foto', 'La cuidadora tendrá que adjuntar una foto para marcarla como hecha.')}
+      ${p.id ? sw('active', 'Activa', p.active ? 'Se programa en los días elegidos' : 'Pausada: no se programa hasta que la actives') : ''}
+      <div style="height:16px"></div>
+      <button class="btn filled block tall" data-act="plan-save" ${dis ? 'disabled' : ''}>${dis ? '<span class="spinner small"></span>' : 'Guardar'}</button>
+    </div></div>`;
+}
+
+async function savePlan() {
+  const p = ui.plan; if (!p || p.saving) return;
+  p.errors = {};
+  const title = p.title.trim();
+  const time = p.hasTime ? normalizeTime(p.time) : null;
+  if (title.length < 3) p.errors.title = 'Escribe la tarea (mínimo 3 letras)';
+  if (!p.days.length) p.errors.days = 'Elige al menos un día';
+  if (p.hasTime && !time) p.errors.time = 'Elige una hora';
+  if (Object.keys(p.errors).length) { render(); return; }
+
+  p.saving = true; render();
+  const isNew = !p.id;
+  try {
+    await backend.saveTemplate({
+      id: p.id, title, description: p.description.trim() || null, category: p.category, order: p.order,
+      timeOfDay: time, weekdays: normalizeDays(p.days), requiresPhoto: p.requiresPhoto, isCritical: p.isCritical, active: p.active,
+    });
+    ui.plan = null;
+    pop();
+    snack(isNew ? 'Tarea añadida al plan' : 'Cambios guardados');
+  } catch (e) {
+    p.saving = false; render(); snack(e.message || 'No se ha podido guardar.');
+  }
+}
+
+function confirmDeletePlan() {
+  const p = ui.plan; if (!p || !p.id) return;
+  const scrim = $('#scrim');
+  scrim.innerHTML = `<div class="sheet col" data-sheet>
+    <div class="title-m">¿Eliminar esta tarea del plan?</div>
+    <div style="height:8px"></div>
+    <p class="body-m muted">Dejará de programarse. Lo que ya se hizo se conserva en el historial. Si solo quieres pausarla, desactívala.</p>
+    <div style="height:16px"></div>
+    <button class="btn filled block" style="background:var(--error);color:var(--on-error)" data-act="plan-delete-yes">Eliminar</button>
+    <div style="height:8px"></div>
+    <button class="btn text block" data-act="plan-delete-no">Cancelar</button>
+  </div>`;
+  scrim.classList.add('show');
+  scrim.onclick = async e => {
+    const b = e.target.closest('[data-act]');
+    if (b && b.dataset.act === 'plan-delete-yes') {
+      closeSheet();
+      p.saving = true; render();
+      try { await backend.deleteTemplate(p.id); ui.plan = null; pop(); snack('Tarea eliminada del plan'); }
+      catch (err) { p.saving = false; render(); snack(err.message || 'No se ha podido eliminar.'); }
+      return;
+    }
+    if ((b && b.dataset.act === 'plan-delete-no') || !e.target.closest('[data-sheet]')) closeSheet();
+  };
+}
+
 /* ============================================================== acciones */
 function activeShift() {
   const shifts = backend.shifts();
@@ -1429,7 +1699,19 @@ $('#app').addEventListener('click', e => {
     case 'open-cameras': go(R.cameras, { push: true }); break;
     case 'open-camera': go(R.cameras + '/' + arg, { push: true }); break;
     case 'open-chat': go(backend.currentUser().role === 'caregiver' ? R.caregiverChat : R.familyChat, { push: true }); break;
-    case 'open-plan': snack('Editor del plan de cuidados: pendiente en la app.'); break;
+    case 'open-plan': go(R.plan, { push: true }); break;
+    case 'plan-new': openPlanEditor(null); break;
+    case 'plan-edit': openPlanEditor(arg); break;
+    case 'plan-cat': if (ui.plan) { ui.plan.category = arg; render(); } break;
+    case 'plan-day': if (ui.plan) {
+      const d = Number(arg);
+      ui.plan.days = ui.plan.days.includes(d) ? ui.plan.days.filter(x => x !== d) : normalizeDays([...ui.plan.days, d]);
+      delete ui.plan.errors.days; render();
+    } break;
+    case 'plan-days': if (ui.plan) { ui.plan.days = arg === 'work' ? [...WORK_DAYS] : [...ALL_DAYS]; delete ui.plan.errors.days; render(); } break;
+    case 'plan-toggle': if (ui.plan && !ui.plan.saving) { ui.plan[arg] = !ui.plan[arg]; render(); } break;
+    case 'plan-save': savePlan(); break;
+    case 'plan-delete': confirmDeletePlan(); break;
     case 'camera-mute': ui.camera.muted = !ui.camera.muted; render(); break;
     case 'camera-retry': ui.camera.error = null; ui.camera.ready = false; render(); break;
     case 'send': sendMessage(); break;
@@ -1460,6 +1742,8 @@ $('#app').addEventListener('focusout', e => { const f = e.target.closest('.field
 $('#app').addEventListener('input', e => {
   const f = e.target.closest('.field'); if (!f) return;
   f.classList.toggle('float', !!e.target.value);
+  const planKey = { planTitle: 'title', planDesc: 'description', planTime: 'time' }[e.target.name];
+  if (planKey) { if (ui.plan) ui.plan[planKey] = e.target.value; return; }
   if (e.target.name) ui.login[e.target.name] = e.target.value;
   if (e.target.name === 'email') {
     const hintEl = f.querySelector('.hint'); const v = e.target.value.trim();
@@ -1531,7 +1815,9 @@ async function boot() {
   applyTheme();
   tickClock(); setInterval(tickClock, 15000);
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
-  if (FIREBASE_CONFIG) {
+  // ?demo fuerza la demo local (sin red): útil para enseñar la app y para probarla.
+  const forceLocal = new URLSearchParams(location.search).has('demo');
+  if (FIREBASE_CONFIG && !forceLocal) {
     backend = new FirebaseBackend(FIREBASE_CONFIG, requestRender);
     render();
     try { await backend.init(); return; }
